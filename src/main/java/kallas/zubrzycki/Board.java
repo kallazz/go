@@ -1,7 +1,10 @@
 package kallas.zubrzycki;
 
+import java.util.ArrayList;
+
 public class Board implements IBoard {
-    private EPointColor[][] boardPoints;
+    private static EPointColor[][] boardPoints;
+    private ArrayList<Stone> stones;
     private int size;
 
     public Board(int size) {
@@ -23,7 +26,7 @@ public class Board implements IBoard {
 
     @Override
     public void printBoard() {
-
+        
     }
 
     @Override
@@ -31,23 +34,49 @@ public class Board implements IBoard {
         boardPoints[x][y] = playerColor;
     }
 
-    @Override
-    public EPointColor[][] getBoardPoints() {
-        return this.boardPoints;
+    //Singleton OOP Pattern
+    public static EPointColor getBoardPoint(int x,int y) {
+        return boardPoints[x][y];
+    }
+
+    public static EPointColor[][] getBoardPoints() {
+        return boardPoints;
     }
 
     @Override
     public boolean checkMove(int x, int y, EPointColor playerColor) {
+
         if(!(boardPoints[x][y] == EPointColor.NONE)){ // Check if the spot is empty
             return false;
         }
+        
         //Check if there are availible liberties
         checkLiberties(x, y, playerColor);
+
+
 
         return true;
     }
 
     private boolean checkLiberties(int x, int y, EPointColor playerColor) {
-        return false;
+        int liberties = 0;
+        if(boardPoints[x][y+1] == EPointColor.NONE || boardPoints[x][y+1] == playerColor) {
+            liberties++;
+        }
+        if(boardPoints[x][y-1] == EPointColor.NONE || boardPoints[x][y-1] == playerColor) {
+            liberties++;
+        }
+        if(boardPoints[x+1][y] == EPointColor.NONE || boardPoints[x][y+1] == playerColor) {
+            liberties++;
+        }
+        if(boardPoints[x-1][y] == EPointColor.NONE || boardPoints[x][y+1] == playerColor) {
+            liberties++;
+        }
+
+        if(liberties > 0){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
