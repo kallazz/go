@@ -6,12 +6,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class GameHistory implements IGameHistory{
+public class GameHistory {
 
-    @Override
-    public void addToDatabase(String move){
+
+    public static void addToDatabase(String move){
         try {
-            FileWriter writer = new FileWriter("database.txt");
+            FileWriter writer = new FileWriter("database" + ".txt");
             writer.write(move + '\n');
             writer.close();
         } catch (IOException e) {
@@ -19,12 +19,11 @@ public class GameHistory implements IGameHistory{
         }
     }
 
-    @Override
-    public String getPreviousMove(int index){
+    public static String getPreviousMove(int index){
         ArrayList<String> moves = new ArrayList<>();
 
         try {
-            FileReader fileReader = new FileReader("database.txt");
+            FileReader fileReader = new FileReader("database" + ".txt");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             String line;

@@ -31,6 +31,7 @@ public class Board implements IBoard {
 
     @Override
     public void updateBoard(int x, int y, EPointColor playerColor) {
+        stones.add(new Stone(x,y,playerColor));
         boardPoints[x][y] = playerColor;
     }
 
@@ -49,10 +50,48 @@ public class Board implements IBoard {
         if(!(boardPoints[x][y] == EPointColor.NONE)){ // Check if the spot is empty
             return false;
         }
-        
-        //Check if there are availible liberties
-        checkLiberties(x, y, playerColor);
 
+        Stone newStone = new Stone(x, y, playerColor);
+
+        //TODO: Calculate Chains
+        
+        
+        if(!newStone.areLibertiesAvailible()){ //Check if there are availible liberties
+            //po czterech sąsiadach sprawdzić czy scapteruje ich chainy
+            boolean willStoneBeCaptured = false;
+            for(Stone stone : stones){
+                if(stone.getX() == newStone.getX() + 1 && stone.getY() == newStone.getY()){
+                    if(stone.getChain().willBeCaptured()){
+                        willStoneBeCaptured = true;
+                    }
+                }
+                else if(stone.getX() == newStone.getX() - 1 && stone.getY() == newStone.getY()){
+                    if(stone.getChain().willBeCaptured()){
+                        willStoneBeCaptured = true;
+                    }
+                }
+                else if(stone.getX() == newStone.getX() && stone.getY() == newStone.getY() + 1){
+                    if(stone.getChain().willBeCaptured()){
+                        willStoneBeCaptured = true;
+                    }
+                }
+                else if(stone.getX() == newStone.getX() && stone.getY() == newStone.getY() - 1){
+                    if(stone.getChain().willBeCaptured()){
+                        willStoneBeCaptured = true;
+                    }
+                }
+                if(willStoneBeCaptured == false){
+                    return false;
+                }
+            }
+
+        }
+
+        //Check if Ko
+        String[] lastMove = GameHistory.getPreviousMove(1).split(" ");
+        if(newStone.getX() == Integer.parseInt(lastMove[1]) && newStone.getY() == Integer.parseInt(lastMove[2]) ){
+            return false;
+        }
 
 
         return true;

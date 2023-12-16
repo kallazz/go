@@ -6,9 +6,9 @@ public class ChainOfStones implements IChainOfStones {
     ArrayList<Stone> stones;
 
     @Override
-    public boolean willBeCaptured(int x, int y) {
+    public boolean willBeCaptured() {
         for(Stone stone : stones) {
-            stone.checkLiberties();
+            stone.areLibertiesAvailible();
         }
     }
 

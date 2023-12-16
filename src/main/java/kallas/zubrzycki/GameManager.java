@@ -1,7 +1,5 @@
 package kallas.zubrzycki;
 
-import java.util.Scanner;
-
 public class GameManager implements IGameManager {
     private Board board;
     private Player player1;
@@ -12,6 +10,8 @@ public class GameManager implements IGameManager {
     private boolean isPassedPlayer2 = false;
 
     private Player currentPlayer = player1;
+
+    private GameHistory gameHistory = new GameHistory("game1");
 
     @Override
     public void initializeGame() {
@@ -33,7 +33,19 @@ public class GameManager implements IGameManager {
             int x = Integer.parseInt(input.split(" ")[1]);
             int y = Integer.parseInt(input.split(" ")[2]);
 
-            //Board.attemptMove(x, y); 
+            if(board.checkMove(x, y, currentPlayer.getColor())){
+                board.updateBoard(x, y, currentPlayer.getColor());
+                gameHistory.addToDatabase(input);
+                
+                if (currentPlayer == player1){
+                    isPassedPlayer1 = false;
+                } else {
+                    isPassedPlayer2 = false;
+                }
+
+            } else {
+                System.out.println("Illegal Move - You lose your turn moron");
+            }
         }
     }
 

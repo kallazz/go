@@ -4,10 +4,15 @@ public class Stone implements IStone{
     EPointColor color;
     int x;
     int y;
-    Board board;
+    ChainOfStones chain;
 
+    public Stone(int x, int y, EPointColor color){
+        this.x = x;
+        this.y = y;
+        this.color = color;
+    }
 
-    public boolean checkLiberties(){
+    public boolean areLibertiesAvailible(){
         int liberties = 0;
         if(Board.getBoardPoint(x, y + 1) == EPointColor.NONE || Board.getBoardPoint(x, y + 1) == color) {
             liberties++;
@@ -27,5 +32,17 @@ public class Stone implements IStone{
         } else {
             return false;
         }
+    }
+
+    public ChainOfStones getChain(){
+        return chain;
+    }
+
+    public int getX(){
+        return x;
+    }
+
+    public int getY(){
+        return y;
     }
 }

@@ -28,4 +28,8 @@ public class Player implements IPlayer {
     public String readInput() {
         return scanner.nextLine();
     }
+
+    public EPointColor getColor(){
+        return color;
+    }
 }
