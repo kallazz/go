@@ -5,5 +5,5 @@ package kallas.zubrzycki;
 
 public interface IBoard {
     public void printBoard();
-    public void updateBoard(int x, int y, EPointState state);
+    public void updateBoard(int x, int y, EPointColor state);
 }
