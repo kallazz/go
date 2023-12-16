@@ -43,10 +43,11 @@ public class GameManager implements IGameManager {
                     
     
                 } else {
-
+                    System.out.println("Wrong move");
                 }
             }
             currentPlayer = player1 == currentPlayer ? player2 : player1;
+            board.printBoard();
         }
     }
 

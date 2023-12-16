@@ -12,7 +12,7 @@ public class Board implements IBoard {
 
         for (int i = 0; i <= size + 1; i++) {
             for (int j = 0; j <= size + 1; j++) {
-                stones[i][j] = new Stone(-1, -1, EPointColor.NONE);
+                stones[i][j] = new Stone(0, 0, EPointColor.NONE);
             }
         }
 
@@ -31,7 +31,19 @@ public class Board implements IBoard {
 
     @Override
     public void printBoard() {
-
+        for(int i = 1; i <= size; i++){
+            for(int j = 1; j <= size; j++){
+                if(boardPoints[i][j] == EPointColor.NONE){
+                    System.out.print('+');
+                } else if(boardPoints[i][j] == EPointColor.BLACK){
+                    System.out.print("\u001B[34m●\u001B[0m");
+                } else if(boardPoints[i][j] == EPointColor.WHITE){
+                    System.out.print("\u001B[33m●\u001B[0m");
+                }
+            }
+            System.out.print('\n');
+        }
+        
     }
 
     @Override

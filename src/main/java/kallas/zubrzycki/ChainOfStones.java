@@ -3,7 +3,7 @@ package kallas.zubrzycki;
 import java.util.ArrayList;
 
 public class ChainOfStones implements IChainOfStones {
-    ArrayList<Stone> stones;
+    ArrayList<Stone> stones = new ArrayList<Stone>();
 
     @Override
     public boolean willBeCaptured() {

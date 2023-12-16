@@ -4,14 +4,30 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class GameHistory {
-
+    public GameHistory() {
+        Path path = Paths.get("./database.txt");
+        try {
+            if(Files.exists(path)){
+                Files.delete(path);
+            }
+            Files.createDirectories(path.getParent());  // Create directories if they don't exist
+            Files.createFile(path);  // Create the file
+        } catch (IOException e) {
+            System.err.println("Error occurred: " + e.getMessage());
+        }
+    }
 
     public void addToDatabase(String move){
+        
+
         try {
-            FileWriter writer = new FileWriter("database" + ".txt");
+            FileWriter writer = new FileWriter("database" + ".txt", true);
             writer.write(move + '\n');
             writer.close();
         } catch (IOException e) {
@@ -32,10 +48,13 @@ public class GameHistory {
             }
 
             bufferedReader.close();
-
+            if(moves.size() - 1 - index < 0 || moves.size() -1 - index > moves.size() - 1){
+                return "";
+            }
             return moves.get(moves.size() - 1 - index);
         } catch (IOException e) {
             System.out.println("An error occurred.");
+            e.printStackTrace();
             return "";
         }
     }
