@@ -23,44 +23,48 @@ public class GameManager implements IGameManager {
     @Override
     public void beginGame() {
         while (!(isPassedPlayer1 && isPassedPlayer2)) { 
-            final String input = currentPlayer.readInput();
-
-            boolean isInputSuccessful = false;
+            boolean isInputCorrect = false;
             do {
-                if (input.equals("pass")) {
-                    if (currentPlayer == player1) {
-                        isPassedPlayer1 = true;
-                    }
-                    else {
-                        isPassedPlayer2 = true;
-                    }
-                    isInputSuccessful = true;
-                }
-                else {
-                    final String[] words = input.split(" ");
-
-                    if (words[0].equals("go")) {
-                        try {
-                            final int x = Integer.parseInt(words[1]);
-                            final int y = Integer.parseInt(words[2]);
-
-                            if (x < 0 || x > BOARD_SIZE || y < 0 || y > BOARD_SIZE) {
-                                System.out.println("x and y should be in <1, " + BOARD_SIZE + ">");
-                            }
-                            else {
-                                isInputSuccessful = true;
-                            }
-                        }
-                        catch (Exception ex) {
-                            System.out.println("Correct format: go <x> <y>");
-                        }
-                    }
-                }
-            } while (!isInputSuccessful);
-
-            
+                final String input = currentPlayer.readInput();
+                isInputCorrect = parseInput(input);
+            } while (!isInputCorrect);
 
         }
+    }
+
+    private boolean parseInput(String input) {
+        if (input.equals("pass")) {
+            if (currentPlayer == player1) {
+                isPassedPlayer1 = true;
+            }
+            else {
+                isPassedPlayer2 = true;
+            }
+            return true;
+        }
+        else {
+            final String[] words = input.split(" ");
+
+            if (words[0].equals("go")) {
+                try {
+                    final int x = Integer.parseInt(words[1]);
+                    final int y = Integer.parseInt(words[2]);
+
+                    if (x < 0 || x > BOARD_SIZE || y < 0 || y > BOARD_SIZE) {
+                        System.out.println("x and y should be in <1, " + BOARD_SIZE + ">");
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                catch (Exception ex) {
+                    System.out.println("Correct format: go <x> <y>");
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
