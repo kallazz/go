@@ -1,10 +1,10 @@
 package kallas.zubrzycki;
 
 public class Board implements IBoard {
-    private String[][] boardPoints;
+    private EPointColor[][] boardPoints;
 
     public Board(int size) {
-        boardPoints = new String[size][size];
+        boardPoints = new EPointColor[size][size];
     }
 
     @Override
@@ -13,7 +13,11 @@ public class Board implements IBoard {
     }
 
     @Override
-    public boolean updateBoard(int x, int y, EPointColor state) {
+    public void updateBoard(int x, int y, EPointColor state) {
 
     }
+
+    @Override
+    public EPointColor[][] getBoardPoints() {
+        return this.boardPoints;
 }
