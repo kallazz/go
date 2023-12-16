@@ -34,6 +34,7 @@ public class Board implements IBoard {
     public EPointColor[][] getBoardPoints() {
         return this.boardPoints;
     }
+<<<<<<< HEAD
 
     @Override
     public boolean checkMove(int x, int y, EPointColor playerColor) {
@@ -49,4 +50,6 @@ public class Board implements IBoard {
     private boolean checkLiberties(int x, int y, EPointColor playerColor) {
 
     }
+=======
+>>>>>>> 7fb6f55 (Added Board tests)
 }
