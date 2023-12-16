@@ -11,7 +11,7 @@ public class GameManager implements IGameManager {
 
     private Player currentPlayer = player1;
 
-    private GameHistory gameHistory = new GameHistory("game1");
+    private GameHistory gameHistory = new GameHistory();
 
     @Override
     public void initializeGame() {

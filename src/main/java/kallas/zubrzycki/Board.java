@@ -1,7 +1,5 @@
 package kallas.zubrzycki;
 
-import java.util.ArrayList;
-
 public class Board implements IBoard {
     private static EPointColor[][] boardPoints;
     private Stone[][] stones;
