@@ -33,7 +33,7 @@ public class GameManager implements IGameManager {
             int x = Integer.parseInt(input.split(" ")[1]);
             int y = Integer.parseInt(input.split(" ")[2]);
 
-            Board.attemptMove(x, y); 
+            //Board.attemptMove(x, y); 
         }
     }
 

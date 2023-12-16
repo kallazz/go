@@ -5,19 +5,20 @@ public class Board implements IBoard {
     private int size;
 
     public Board(int size) {
+        this.size = size;
+
         boardPoints = new EPointColor[size + 2][size + 2];
-        for(int i = 0; i < size; i++){
-            for(int j = 0; j < size; j++){
+        for (int i = 1; i <= size; i++) {
+            for(int j = 1; j <= size; j++){
                 boardPoints[i][j] = EPointColor.NONE;
             }
         }
-        for(int i = 0; i < size; i ++){
+        for (int i = 0; i <= size + 1; i++) {
             boardPoints[i][0] = EPointColor.BORDER;
-            boardPoints[i][size - 1] = EPointColor.BORDER;
+            boardPoints[i][size + 1] = EPointColor.BORDER;
             boardPoints[0][i] = EPointColor.BORDER;
-            boardPoints[size - 1][i] = EPointColor.BORDER;
+            boardPoints[size + 1][i] = EPointColor.BORDER;
         }
-        this.size = size;
     }
 
     @Override
@@ -26,15 +27,14 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void updateBoard(int x, int y, EPointColor state) {
-
+    public void updateBoard(int x, int y, EPointColor playerColor) {
+        boardPoints[x][y] = playerColor;
     }
 
     @Override
     public EPointColor[][] getBoardPoints() {
         return this.boardPoints;
     }
-<<<<<<< HEAD
 
     @Override
     public boolean checkMove(int x, int y, EPointColor playerColor) {
@@ -48,8 +48,6 @@ public class Board implements IBoard {
     }
 
     private boolean checkLiberties(int x, int y, EPointColor playerColor) {
-
+        return false;
     }
-=======
->>>>>>> 7fb6f55 (Added Board tests)
 }
