@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class GameHistory {
 
 
-    public static void addToDatabase(String move){
+    public void addToDatabase(String move){
         try {
             FileWriter writer = new FileWriter("database" + ".txt");
             writer.write(move + '\n');

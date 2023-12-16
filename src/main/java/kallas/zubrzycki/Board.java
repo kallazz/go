@@ -9,6 +9,13 @@ public class Board implements IBoard {
         this.size = size;
         stones = new Stone[size + 2][size + 2];
         boardPoints = new EPointColor[size + 2][size + 2];
+
+        for (int i = 0; i <= size + 1; i++) {
+            for (int j = 0; j <= size + 1; j++) {
+                stones[i][j] = new Stone(-1, -1, EPointColor.NONE);
+            }
+        }
+
         for (int i = 1; i <= size; i++) {
             for(int j = 1; j <= size; j++){
                 boardPoints[i][j] = EPointColor.NONE;
@@ -24,7 +31,7 @@ public class Board implements IBoard {
 
     @Override
     public void printBoard() {
-        
+
     }
 
     @Override
@@ -51,12 +58,10 @@ public class Board implements IBoard {
 
         Stone newStone = new Stone(x, y, playerColor);
 
-        //TODO: Calculate Chains
         resetChains();
-
         for (int i = 1; i <= size; i++) {
             for (Stone stone : stones[i]) {
-                if (stone.getChain() == null) {
+                if (stone.doesExist() && stone.getChain() == null) {
                     calculateChains(stone, new ChainOfStones());
                 }
             }
@@ -89,9 +94,14 @@ public class Board implements IBoard {
 
         }
 
-        //Check if Ko
-        String[] lastMove = GameHistory.getPreviousMove(1).split(" ");
-        if(newStoneX == Integer.parseInt(lastMove[1]) && newStoneY == Integer.parseInt(lastMove[2]) ){
+        // Check if 
+        String lastMove = GameHistory.getPreviousMove(1);
+        if (lastMove.equals("")) {
+            return true;
+        }
+
+        String[] move = GameHistory.getPreviousMove(1).split(" ");
+        if (newStoneX == Integer.parseInt(move[1]) && newStoneY == Integer.parseInt(move[2]) ){
             return false;
         }
 
@@ -130,16 +140,16 @@ public class Board implements IBoard {
             int currentY = stone.getY();
             EPointColor currentColor = stone.getColor();
 
-            if (stones[currentX + 1][currentY].getColor() == currentColor) {
+            if (stones[currentX + 1][currentY].doesExist() && stones[currentX + 1][currentY].getColor() == currentColor) {
                 calculateChains(stones[currentX + 1][currentY], chain);
             }
-            if (stones[currentX][currentY + 1].getColor() == currentColor) {
+            if (stones[currentX][currentY + 1].doesExist() && stones[currentX][currentY + 1].getColor() == currentColor) {
                 calculateChains(stones[currentX][currentY + 1], chain);
             }
-            if (stones[currentX - 1][currentY].getColor() == currentColor) {
+            if (stones[currentX - 1][currentY].doesExist() && stones[currentX - 1][currentY].getColor() == currentColor) {
                 calculateChains(stones[currentX - 1][currentY], chain);
             }
-            if (stones[currentX][currentY - 1].getColor() == currentColor) {
+            if (stones[currentX][currentY - 1].doesExist() && stones[currentX][currentY - 1].getColor() == currentColor) {
                 calculateChains(stones[currentX][currentY - 1], chain);
             }
         }
@@ -147,7 +157,9 @@ public class Board implements IBoard {
     private void resetChains() {
         for (int i = 1; i <= size; i++) {
             for (Stone stone : stones[i]) {
-                stone.setChain(null);
+                if (stone.doesExist()) {
+                    stone.setChain(null);
+                }
             }
         }
     }

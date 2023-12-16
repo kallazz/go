@@ -34,6 +34,10 @@ public class Stone implements IStone{
         }
     }
 
+    public boolean doesExist() {
+        return this.color == EPointColor.NONE ? false : true;
+    }
+
     public EPointColor getColor() {
         return color;
     }

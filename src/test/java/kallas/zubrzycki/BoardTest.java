@@ -50,4 +50,9 @@ public class BoardTest {
         boardPoints = Board.getBoardPoints();
         assertEquals(EPointColor.WHITE, boardPoints[2][3]);
     }
+
+    @Test
+    public void shouldPreventBadMove() {
+        
+    }
 }
