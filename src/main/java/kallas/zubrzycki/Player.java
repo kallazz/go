@@ -1,15 +1,16 @@
 package kallas.zubrzycki;
 
+import java.util.Scanner;
+
 public class Player implements IPlayer {
 
     private int capturedStones = 0;
+    private Scanner scanner;
     private EPointColor color;
-    private Board board;
 
-    Player(EPointColor color, Board board){
+    Player(EPointColor color){
         this.color = color;
-        this.board = board;
-        this.board.addObserverPlayer(color);
+        scanner = new Scanner(System.in);
     }
 
     @Override
@@ -25,5 +26,10 @@ public class Player implements IPlayer {
     @Override
     public int getCapturedStones(){
         return capturedStones;
+    }
+
+    @Override
+    public String readInput() {
+        return scanner.nextLine();
     }
 }
