@@ -9,7 +9,8 @@ public class GameManager implements IGameManager {
     private boolean isPassedPlayer1 = false;
     private boolean isPassedPlayer2 = false;
 
-    private Player currentPlayer = player1;
+    private Player currentPlayer;
+
 
     private GameHistory gameHistory = new GameHistory();
 
@@ -17,6 +18,7 @@ public class GameManager implements IGameManager {
     public void initializeGame() {
         player1 = new Player(EPointColor.BLACK);
         player2 = new Player(EPointColor.WHITE);
+        currentPlayer = player1;
         board = new Board(BOARD_SIZE);
     }
 
@@ -27,30 +29,31 @@ public class GameManager implements IGameManager {
             String input;
             do {
                 input = currentPlayer.readInput();
+                System.out.println("what is in input???");
                 isInputCorrect = parseInput(input);
             } while (!isInputCorrect);
-            
-            int x = Integer.parseInt(input.split(" ")[1]);
-            int y = Integer.parseInt(input.split(" ")[2]);
-
-            if(board.checkMove(x, y, currentPlayer.getColor())){
-                board.updateBoard(x, y, currentPlayer.getColor());
-                gameHistory.addToDatabase(input);
+            if (!input.equals("pass")) {
+                int x = Integer.parseInt(input.split(" ")[1]);
+                int y = Integer.parseInt(input.split(" ")[2]);
                 
-                if (currentPlayer == player1){
-                    isPassedPlayer1 = false;
+                if(board.checkMove(x, y, currentPlayer.getColor())){
+                    board.updateBoard(x, y, currentPlayer.getColor());
+                    gameHistory.addToDatabase(input);
+                    
+                    
+    
                 } else {
-                    isPassedPlayer2 = false;
-                }
 
-            } else {
-                System.out.println("Illegal Move - You lose your turn moron");
+                }
             }
+            currentPlayer = player1 == currentPlayer ? player2 : player1;
         }
     }
 
     private boolean parseInput(String input) {
+        System.out.println("Parsing input: " + input);
         if (input.equals("pass")) {
+            System.out.println("we are passing");
             if (currentPlayer == player1) {
                 isPassedPlayer1 = true;
             }

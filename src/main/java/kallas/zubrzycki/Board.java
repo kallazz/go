@@ -53,8 +53,10 @@ public class Board implements IBoard {
     public boolean checkMove(int x, int y, EPointColor playerColor) {
 
         if(!(boardPoints[x][y] == EPointColor.NONE)){ // Check if the spot is empty
+            System.out.println("Point: " + boardPoints[x][y].toString());
             return false;
         }
+
 
         Stone newStone = new Stone(x, y, playerColor);
 
