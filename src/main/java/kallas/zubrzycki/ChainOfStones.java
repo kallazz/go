@@ -12,4 +12,7 @@ public class ChainOfStones implements IChainOfStones {
         }
     }
 
+    public void addStone(Stone stone) {
+        stones.add(stone);
+    }
 }

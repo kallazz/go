@@ -1,10 +1,10 @@
 package kallas.zubrzycki;
 
 public class Stone implements IStone{
-    EPointColor color;
-    int x;
-    int y;
-    ChainOfStones chain;
+    private EPointColor color;
+    private int x;
+    private int y;
+    private ChainOfStones chain;
 
     public Stone(int x, int y, EPointColor color){
         this.x = x;
@@ -34,8 +34,16 @@ public class Stone implements IStone{
         }
     }
 
+    public EPointColor getColor() {
+        return color;
+    }
+
     public ChainOfStones getChain(){
         return chain;
+    }
+
+    public void setChain(ChainOfStones chain) {
+        this.chain = chain;
     }
 
     public int getX(){

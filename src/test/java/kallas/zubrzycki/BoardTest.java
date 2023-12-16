@@ -44,10 +44,10 @@ public class BoardTest {
         EPointColor[][] boardPoints;
 
         board.updateBoard(2, 3, EPointColor.BLACK);
-        boardPoints = board.getBoardPoints();
+        boardPoints = Board.getBoardPoints();
         assertEquals(EPointColor.BLACK, boardPoints[2][3]);
         board.updateBoard(2, 3, EPointColor.WHITE);
-        boardPoints = board.getBoardPoints();
+        boardPoints = Board.getBoardPoints();
         assertEquals(EPointColor.WHITE, boardPoints[2][3]);
     }
 }

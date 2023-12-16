@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 public class Board implements IBoard {
     private static EPointColor[][] boardPoints;
-    private ArrayList<Stone> stones;
+    private Stone[][] stones;
     private int size;
 
     public Board(int size) {
         this.size = size;
-
+        stones = new Stone[size + 2][size + 2];
         boardPoints = new EPointColor[size + 2][size + 2];
         for (int i = 1; i <= size; i++) {
             for(int j = 1; j <= size; j++){
@@ -31,7 +31,7 @@ public class Board implements IBoard {
 
     @Override
     public void updateBoard(int x, int y, EPointColor playerColor) {
-        stones.add(new Stone(x,y,playerColor));
+        stones[x][y] = new Stone(x, y, playerColor);
         boardPoints[x][y] = playerColor;
     }
 
@@ -54,42 +54,46 @@ public class Board implements IBoard {
         Stone newStone = new Stone(x, y, playerColor);
 
         //TODO: Calculate Chains
-        
-        
+        resetChains();
+
+        for (int i = 1; i <= size; i++) {
+            for (Stone stone : stones[i]) {
+                if (stone.getChain() == null) {
+                    calculateChains(stone, new ChainOfStones());
+                }
+            }
+        }
+
+        int newStoneX = newStone.getX();
+        int newStoneY = newStone.getY();
+
         if(!newStone.areLibertiesAvailible()){ //Check if there are availible liberties
             //po czterech sąsiadach sprawdzić czy scapteruje ich chainy
             boolean willStoneBeCaptured = false;
-            for(Stone stone : stones){
-                if(stone.getX() == newStone.getX() + 1 && stone.getY() == newStone.getY()){
-                    if(stone.getChain().willBeCaptured()){
-                        willStoneBeCaptured = true;
-                    }
-                }
-                else if(stone.getX() == newStone.getX() - 1 && stone.getY() == newStone.getY()){
-                    if(stone.getChain().willBeCaptured()){
-                        willStoneBeCaptured = true;
-                    }
-                }
-                else if(stone.getX() == newStone.getX() && stone.getY() == newStone.getY() + 1){
-                    if(stone.getChain().willBeCaptured()){
-                        willStoneBeCaptured = true;
-                    }
-                }
-                else if(stone.getX() == newStone.getX() && stone.getY() == newStone.getY() - 1){
-                    if(stone.getChain().willBeCaptured()){
-                        willStoneBeCaptured = true;
-                    }
-                }
-                if(willStoneBeCaptured == false){
-                    return false;
-                }
+
+
+            if(stones[newStoneX + 1][newStoneY].getChain().willBeCaptured()){
+                willStoneBeCaptured = true;
+            }
+            if(stones[newStoneX][newStoneY + 1].getChain().willBeCaptured()){
+                willStoneBeCaptured = true;
+            }
+            if(stones[newStoneX - 1][newStoneY].getChain().willBeCaptured()){
+                willStoneBeCaptured = true;
+            }
+            if(stones[newStoneX][newStoneY - 1].getChain().willBeCaptured()){
+                willStoneBeCaptured = true;
+            }
+
+            if(willStoneBeCaptured == false){
+                return false;
             }
 
         }
 
         //Check if Ko
         String[] lastMove = GameHistory.getPreviousMove(1).split(" ");
-        if(newStone.getX() == Integer.parseInt(lastMove[1]) && newStone.getY() == Integer.parseInt(lastMove[2]) ){
+        if(newStoneX == Integer.parseInt(lastMove[1]) && newStoneY == Integer.parseInt(lastMove[2]) ){
             return false;
         }
 
@@ -116,6 +120,37 @@ public class Board implements IBoard {
             return true;
         } else {
             return false;
+        }
+    }
+
+    private void calculateChains(Stone stone, ChainOfStones chain) {
+            chain.addStone(stone);
+            stone.setChain(chain);
+
+            // Do same shit on neighbours
+            int currentX = stone.getX();
+            int currentY = stone.getY();
+            EPointColor currentColor = stone.getColor();
+
+            if (stones[currentX + 1][currentY].getColor() == currentColor) {
+                calculateChains(stones[currentX + 1][currentY], chain);
+            }
+            if (stones[currentX][currentY + 1].getColor() == currentColor) {
+                calculateChains(stones[currentX][currentY + 1], chain);
+            }
+            if (stones[currentX - 1][currentY].getColor() == currentColor) {
+                calculateChains(stones[currentX - 1][currentY], chain);
+            }
+            if (stones[currentX][currentY - 1].getColor() == currentColor) {
+                calculateChains(stones[currentX][currentY - 1], chain);
+            }
+        }
+
+    private void resetChains() {
+        for (int i = 1; i <= size; i++) {
+            for (Stone stone : stones[i]) {
+                stone.setChain(null);
+            }
         }
     }
 }
