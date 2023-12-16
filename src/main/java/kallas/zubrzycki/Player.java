@@ -13,10 +13,6 @@ public class Player implements IPlayer {
         scanner = new Scanner(System.in);
     }
 
-    @Override
-    public void attemptMove(int x, int y){
-
-    }
 
     @Override
     public void pass(){

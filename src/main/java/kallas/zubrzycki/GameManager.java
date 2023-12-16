@@ -24,11 +24,16 @@ public class GameManager implements IGameManager {
     public void beginGame() {
         while (!(isPassedPlayer1 && isPassedPlayer2)) { 
             boolean isInputCorrect = false;
+            String input;
             do {
-                final String input = currentPlayer.readInput();
+                input = currentPlayer.readInput();
                 isInputCorrect = parseInput(input);
             } while (!isInputCorrect);
+            
+            int x = Integer.parseInt(input.split(" ")[1]);
+            int y = Integer.parseInt(input.split(" ")[2]);
 
+            Board.attemptMove(x, y); 
         }
     }
 
