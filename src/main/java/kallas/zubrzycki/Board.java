@@ -123,33 +123,12 @@ public class Board implements IBoard {
         return true;
     }
 
-    private boolean checkLiberties(int x, int y, EPointColor playerColor) {
-        int liberties = 0;
-        if(boardPoints[x][y+1] == EPointColor.NONE || boardPoints[x][y+1] == playerColor) {
-            liberties++;
-        }
-        if(boardPoints[x][y-1] == EPointColor.NONE || boardPoints[x][y-1] == playerColor) {
-            liberties++;
-        }
-        if(boardPoints[x+1][y] == EPointColor.NONE || boardPoints[x][y+1] == playerColor) {
-            liberties++;
-        }
-        if(boardPoints[x-1][y] == EPointColor.NONE || boardPoints[x][y+1] == playerColor) {
-            liberties++;
-        }
 
-        if(liberties > 0){
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     private void calculateChains(Stone stone, ChainOfStones chain) {
             chain.addStone(stone);
             stone.setChain(chain);
 
-            // Do same shit on neighbours
             int currentX = stone.getX();
             int currentY = stone.getY();
             EPointColor currentColor = stone.getColor();
