@@ -1,7 +1,7 @@
 package kallas.zubrzycki;
 
 public interface IGameManager {
-    public void initializeGame();
-    public void beginGame();
+    public void startGameLoop();
     public void countScore();
+    public void initializeGame();
 }

@@ -1,5 +1,5 @@
 package kallas.zubrzycki;
 
 public enum EPointColor {
-    NONE, WHITE, BLACK, BORDER
+    WHITE, BLACK, NONE, BORDER
 }

@@ -1,7 +1,7 @@
 package kallas.zubrzycki;
 
 public interface IPlayer {
-    public void pass();
     public int getCapturedStones();
+    public EPointColor getColor();
     public String readInput();
 }

@@ -6,12 +6,11 @@ package kallas.zubrzycki;
  */
 public class App 
 {
-    public static void main( String[] args )
+    public static void main(String[] args)
     {
-        GameManager gameManager = new GameManager();
+        final GameManager gameManager = new GameManager();
 
         gameManager.initializeGame();
-        gameManager.beginGame();
-        
+        gameManager.startGameLoop();
     }
 }

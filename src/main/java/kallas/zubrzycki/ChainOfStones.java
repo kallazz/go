@@ -7,8 +7,8 @@ public class ChainOfStones implements IChainOfStones {
 
     @Override
     public boolean willBeCaptured() {
-        for(Stone stone : stones) {
-            if(stone.areLibertiesAvailible()){
+        for (Stone stone: stones) {
+            if (stone.areLibertiesAvailible()) {
                 return false;
             }
         }

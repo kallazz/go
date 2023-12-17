@@ -17,7 +17,7 @@ public class Board implements IBoard {
         }
 
         for (int i = 1; i <= size; i++) {
-            for(int j = 1; j <= size; j++){
+            for (int j = 1; j <= size; j++) {
                 boardPoints[i][j] = EPointColor.NONE;
             }
         }
@@ -29,21 +29,30 @@ public class Board implements IBoard {
         }
     }
 
+    // Static methods
+    public static EPointColor getBoardPoint(int x, int y) {
+        return boardPoints[x][y];
+    }
+
+    public static EPointColor[][] getBoardPoints() {
+        return boardPoints;
+    }
+
+    // Regular methods
     @Override
     public void printBoard() {
-        for(int i = 1; i <= size; i++){
-            for(int j = 1; j <= size; j++){
-                if(boardPoints[i][j] == EPointColor.NONE){
+        for (int i = 1; i <= size; i++) {
+            for (int j = 1; j <= size; j++) {
+                if (boardPoints[i][j] == EPointColor.NONE) {
                     System.out.print('+');
-                } else if(boardPoints[i][j] == EPointColor.BLACK){
+                } else if (boardPoints[i][j] == EPointColor.BLACK) {
                     System.out.print("\u001B[34m●\u001B[0m");
-                } else if(boardPoints[i][j] == EPointColor.WHITE){
+                } else if (boardPoints[i][j] == EPointColor.WHITE) {
                     System.out.print("\u001B[33m●\u001B[0m");
                 }
             }
             System.out.print('\n');
         }
-        
     }
 
     @Override
@@ -52,29 +61,20 @@ public class Board implements IBoard {
         boardPoints[x][y] = playerColor;
     }
 
-    //Singleton OOP Pattern
-    public static EPointColor getBoardPoint(int x,int y) {
-        return boardPoints[x][y];
-    }
-
-    public static EPointColor[][] getBoardPoints() {
-        return boardPoints;
-    }
-
     @Override
     public boolean checkMove(int x, int y, EPointColor playerColor) {
 
-        if(!(boardPoints[x][y] == EPointColor.NONE)){ // Check if the spot is empty
+        if (!(boardPoints[x][y] == EPointColor.NONE)) { // Check if the spot is empty
             System.out.println("Point: " + boardPoints[x][y].toString());
             return false;
         }
 
 
-        Stone newStone = new Stone(x, y, playerColor);
+        final Stone newStone = new Stone(x, y, playerColor);
 
         resetChains();
         for (int i = 1; i <= size; i++) {
-            for (Stone stone : stones[i]) {
+            for (Stone stone: stones[i]) {
                 if (stone.doesExist() && stone.getChain() == null) {
                     calculateChains(stone, new ChainOfStones());
                 }
@@ -84,25 +84,25 @@ public class Board implements IBoard {
         int newStoneX = newStone.getX();
         int newStoneY = newStone.getY();
 
-        if(!newStone.areLibertiesAvailible()){ //Check if there are availible liberties
+        if (!newStone.areLibertiesAvailible()) { //Check if there are availible liberties
             //po czterech sąsiadach sprawdzić czy scapteruje ich chainy
             boolean willStoneBeCaptured = false;
 
 
-            if(stones[newStoneX + 1][newStoneY].getChain().willBeCaptured()){
+            if (stones[newStoneX + 1][newStoneY].getChain().willBeCaptured()) {
                 willStoneBeCaptured = true;
             }
-            if(stones[newStoneX][newStoneY + 1].getChain().willBeCaptured()){
+            if (stones[newStoneX][newStoneY + 1].getChain().willBeCaptured()) {
                 willStoneBeCaptured = true;
             }
-            if(stones[newStoneX - 1][newStoneY].getChain().willBeCaptured()){
+            if (stones[newStoneX - 1][newStoneY].getChain().willBeCaptured()) {
                 willStoneBeCaptured = true;
             }
-            if(stones[newStoneX][newStoneY - 1].getChain().willBeCaptured()){
+            if (stones[newStoneX][newStoneY - 1].getChain().willBeCaptured()) {
                 willStoneBeCaptured = true;
             }
 
-            if(willStoneBeCaptured == false){
+            if (willStoneBeCaptured == false) {
                 return false;
             }
 
@@ -115,7 +115,7 @@ public class Board implements IBoard {
         }
 
         String[] move = GameHistory.getPreviousMove(1).split(" ");
-        if (newStoneX == Integer.parseInt(move[1]) && newStoneY == Integer.parseInt(move[2]) ){
+        if (newStoneX == Integer.parseInt(move[1]) && newStoneY == Integer.parseInt(move[2])) {
             return false;
         }
 
@@ -123,33 +123,31 @@ public class Board implements IBoard {
         return true;
     }
 
-
-
     private void calculateChains(Stone stone, ChainOfStones chain) {
-            chain.addStone(stone);
-            stone.setChain(chain);
+        chain.addStone(stone);
+        stone.setChain(chain);
 
-            int currentX = stone.getX();
-            int currentY = stone.getY();
-            EPointColor currentColor = stone.getColor();
+        final int currentX = stone.getX();
+        final int currentY = stone.getY();
+        final EPointColor currentColor = stone.getColor();
 
-            if (stones[currentX + 1][currentY].doesExist() && stones[currentX + 1][currentY].getColor() == currentColor) {
-                calculateChains(stones[currentX + 1][currentY], chain);
-            }
-            if (stones[currentX][currentY + 1].doesExist() && stones[currentX][currentY + 1].getColor() == currentColor) {
-                calculateChains(stones[currentX][currentY + 1], chain);
-            }
-            if (stones[currentX - 1][currentY].doesExist() && stones[currentX - 1][currentY].getColor() == currentColor) {
-                calculateChains(stones[currentX - 1][currentY], chain);
-            }
-            if (stones[currentX][currentY - 1].doesExist() && stones[currentX][currentY - 1].getColor() == currentColor) {
-                calculateChains(stones[currentX][currentY - 1], chain);
-            }
+        if (stones[currentX + 1][currentY].doesExist() && stones[currentX + 1][currentY].getColor() == currentColor) {
+            calculateChains(stones[currentX + 1][currentY], chain);
         }
+        if (stones[currentX][currentY + 1].doesExist() && stones[currentX][currentY + 1].getColor() == currentColor) {
+            calculateChains(stones[currentX][currentY + 1], chain);
+        }
+        if (stones[currentX - 1][currentY].doesExist() && stones[currentX - 1][currentY].getColor() == currentColor) {
+            calculateChains(stones[currentX - 1][currentY], chain);
+        }
+        if (stones[currentX][currentY - 1].doesExist() && stones[currentX][currentY - 1].getColor() == currentColor) {
+            calculateChains(stones[currentX][currentY - 1], chain);
+        }
+    }
 
     private void resetChains() {
         for (int i = 1; i <= size; i++) {
-            for (Stone stone : stones[i]) {
+            for (Stone stone: stones[i]) {
                 if (stone.doesExist()) {
                     stone.setChain(null);
                 }

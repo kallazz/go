@@ -8,18 +8,12 @@ public class Player implements IPlayer {
     private Scanner scanner = new Scanner(System.in);
     private EPointColor color;
 
-    Player(EPointColor color){
+    Player(EPointColor color) {
         this.color = color;
     }
 
-
     @Override
-    public void pass(){
-
-    }
-    
-    @Override
-    public int getCapturedStones(){
+    public int getCapturedStones() {
         return capturedStones;
     }
 
@@ -28,7 +22,7 @@ public class Player implements IPlayer {
         return scanner.nextLine();
     }
 
-    public EPointColor getColor(){
+    public EPointColor getColor() {
         return color;
     }
 }

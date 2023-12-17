@@ -11,50 +11,48 @@ import java.util.ArrayList;
 
 public class GameHistory {
     public GameHistory() {
-        Path path = Paths.get("./database.txt");
+        final Path path = Paths.get("./database.txt");
         try {
-            if(Files.exists(path)){
+            if (Files.exists(path)) {
                 Files.delete(path);
             }
-            Files.createDirectories(path.getParent());  // Create directories if they don't exist
-            Files.createFile(path);  // Create the file
+            Files.createDirectories(path.getParent());
+            Files.createFile(path);
         } catch (IOException e) {
             System.err.println("Error occurred: " + e.getMessage());
         }
     }
 
-    public void addToDatabase(String move){
-        
-
+    public void addToDatabase(String move) {
         try {
-            FileWriter writer = new FileWriter("database" + ".txt", true);
+            final FileWriter writer = new FileWriter("database" + ".txt", true);
             writer.write(move + '\n');
             writer.close();
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            System.out.println("Error occurred: " + e.getMessage());
         }
     }
 
-    public static String getPreviousMove(int index){
-        ArrayList<String> moves = new ArrayList<>();
+    public static String getPreviousMove(int index) {
+        ArrayList<String> moves = new ArrayList<String>();
 
         try {
-            FileReader fileReader = new FileReader("database" + ".txt");
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            final FileReader fileReader = new FileReader("database" + ".txt");
+            final BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 moves.add(line);
             }
-
             bufferedReader.close();
-            if(moves.size() - 1 - index < 0 || moves.size() -1 - index > moves.size() - 1){
+
+            // Check if array index isn't out of bounds
+            if (moves.size() - 1 - index < 0 || moves.size() - 1 - index > moves.size() - 1) {
                 return "";
             }
             return moves.get(moves.size() - 1 - index);
         } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
+            System.out.println("Error occurred: " + e.getMessage());
             return "";
         }
     }
