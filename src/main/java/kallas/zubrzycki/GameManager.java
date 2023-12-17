@@ -31,6 +31,8 @@ public class GameManager implements IGameManager {
             do {
                 input = currentPlayer.readInput();
                 isInputCorrect = parseInput(input);
+
+                board.printBoard();
             } while (!isInputCorrect);
 
             if (!input.equals("pass")) {
@@ -48,7 +50,7 @@ public class GameManager implements IGameManager {
                         isPassedPlayer2 = false;
                     }
                 } else {
-                    System.out.println("Wrong move");
+                    board.addErrorMessage("Wrong move - you lose your turn");
                 }
             } else {
                 gameHistory.addToDatabase(input);
@@ -60,7 +62,7 @@ public class GameManager implements IGameManager {
                 }
             }
 
-            currentPlayer = player1 == currentPlayer ? player2 : player1;
+            currentPlayer = (player1 == currentPlayer) ? player2 : player1;
         }
     }
 
@@ -76,17 +78,18 @@ public class GameManager implements IGameManager {
                     final int y = Integer.parseInt(words[2]);
 
                     if (x < 0 || x > BOARD_SIZE || y < 0 || y > BOARD_SIZE) {
-                        System.out.println("x and y should be in <1, " + BOARD_SIZE + ">");
+                        board.addErrorMessage("x and y should be in <1, " + BOARD_SIZE + ">");
                         return false;
                     } else {
                         return true;
                     }
                 } catch (Exception ex) {
-                    System.out.println("Correct format: go <x> <y>");
+                    board.addErrorMessage("Correct format: go <x> <y>");
                     return false;
                 }
             }
         }
+        board.addErrorMessage("Allowed actions are: 'go <x> <y>' or 'pass'");
         return false;
     }
 
