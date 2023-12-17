@@ -72,6 +72,8 @@ public class GameHistory implements IGameHistory {
 
             // Look for an actual move, not a pass
             while (moves.get(moves.size() - 1 - index).equals("pass")) {
+                // TODO: Trzeba się zastanowić jak to powinno działać
+                // TODO: szukamy ostatniego ruchu przeciwnika czy ostatniego ruchu w ogóle?
                 index += 2;
 
                 if (moves.size() - 1 - index < 0 || moves.size() - 1 - index > moves.size() - 1) {
