@@ -23,9 +23,9 @@ public class GameManager implements IGameManager {
 
     @Override
     public void startGameLoop() {
-        board.printBoard();
-
         while (!(isPassedPlayer1 && isPassedPlayer2)) {
+            board.printBoard();
+
             boolean isInputCorrect = false;
             String input;
             do {
@@ -40,11 +40,24 @@ public class GameManager implements IGameManager {
                 if (board.checkMove(x, y, currentPlayer.getColor())) {
                     board.updateBoard(x, y, currentPlayer.getColor());
                     gameHistory.addToDatabase(input);
+
+                    // Reset this player's pass status
+                    if (currentPlayer == player1) {
+                        isPassedPlayer1 = false;
+                    } else {
+                        isPassedPlayer2 = false;
+                    }
                 } else {
                     System.out.println("Wrong move");
                 }
             } else {
-                // Handle passing
+                gameHistory.addToDatabase(input);
+
+                if (currentPlayer == player1) {
+                    isPassedPlayer1 = true;
+                } else {
+                    isPassedPlayer2 = true;
+                }
             }
 
             currentPlayer = player1 == currentPlayer ? player2 : player1;
@@ -53,11 +66,6 @@ public class GameManager implements IGameManager {
 
     private boolean parseInput(String input) {
         if (input.equals("pass")) {
-            if (currentPlayer == player1) {
-                isPassedPlayer1 = true;
-            } else {
-                isPassedPlayer2 = true;
-            }
             return true;
         } else {
             final String[] words = input.split(" ");

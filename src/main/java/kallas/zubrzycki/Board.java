@@ -63,16 +63,15 @@ public class Board implements IBoard {
 
     @Override
     public boolean checkMove(int x, int y, EPointColor playerColor) {
-
-        if (!(boardPoints[x][y] == EPointColor.NONE)) { // Check if the spot is empty
+        // Check if the spot is empty
+        if (!(boardPoints[x][y] == EPointColor.NONE)) {
             System.out.println("Point: " + boardPoints[x][y].toString());
             return false;
         }
 
+        resetChains();
 
         final Stone newStone = new Stone(x, y, playerColor);
-
-        resetChains();
         for (int i = 1; i <= size; i++) {
             for (Stone stone: stones[i]) {
                 if (stone.doesExist() && stone.getChain() == null) {
@@ -85,9 +84,7 @@ public class Board implements IBoard {
         int newStoneY = newStone.getY();
 
         if (!newStone.areLibertiesAvailible()) { //Check if there are availible liberties
-            //po czterech sąsiadach sprawdzić czy scapteruje ich chainy
             boolean willStoneBeCaptured = false;
-
 
             if (stones[newStoneX + 1][newStoneY].getChain().willBeCaptured()) {
                 willStoneBeCaptured = true;
@@ -108,7 +105,6 @@ public class Board implements IBoard {
 
         }
 
-        // Check if 
         String lastMove = GameHistory.getPreviousMove(1);
         if (lastMove.equals("")) {
             return true;
