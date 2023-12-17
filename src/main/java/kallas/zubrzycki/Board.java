@@ -1,12 +1,28 @@
 package kallas.zubrzycki;
 
 public class Board implements IBoard {
-    private static EPointColor[][] boardPoints;
+    private static volatile Board instance = null;
+
+    private EPointColor[][] boardPoints;
     private Stone[][] stones;
     private int size;
     private String errorMessage = "";
 
-    public Board(int size) {
+    private Board() {}
+
+    public static Board getInstance() {
+        if (instance == null) {
+            synchronized (Board.class) {
+                if (instance == null) {
+                    instance = new Board();
+                }
+            }
+        }
+        return instance;
+    }
+
+    @Override
+    public void initialize(int size) {
         this.size = size;
         stones = new Stone[size + 2][size + 2];
         boardPoints = new EPointColor[size + 2][size + 2];
@@ -30,21 +46,6 @@ public class Board implements IBoard {
         }
     }
 
-    // Static methods
-    public static EPointColor getBoardPoint(int x, int y) {
-        return boardPoints[x][y];
-    }
-
-    public static EPointColor[][] getBoardPoints() {
-        return boardPoints;
-    }
-
-    // Regular methods
-    @Override
-    public void addErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
     @Override
     public void printBoard() {
         // Clear the console
@@ -59,11 +60,11 @@ public class Board implements IBoard {
 
         for (int i = 1; i <= size; i++) {
             for (int j = 1; j <= size; j++) {
-                if (boardPoints[i][j] == EPointColor.NONE) {
+                if (boardPoints[j][i] == EPointColor.NONE) {
                     System.out.print('+');
-                } else if (boardPoints[i][j] == EPointColor.BLACK) {
+                } else if (boardPoints[j][i] == EPointColor.BLACK) {
                     System.out.print("\u001B[34m●\u001B[0m");
-                } else if (boardPoints[i][j] == EPointColor.WHITE) {
+                } else if (boardPoints[j][i] == EPointColor.WHITE) {
                     System.out.print("\u001B[33m●\u001B[0m");
                 }
             }
@@ -121,13 +122,13 @@ public class Board implements IBoard {
 
         }
 
-        String lastMove = GameHistory.getPreviousMove(1);
+        String lastMove = GameHistory.getInstance().getPreviousMove(1);
         if (lastMove.equals("")) {
             return true;
         }
 
-        String[] move = GameHistory.getPreviousMove(1).split(" ");
-        if (newStoneX == Integer.parseInt(move[1]) && newStoneY == Integer.parseInt(move[2])) {
+        String[] lastMoveSplit = lastMove.split(" ");
+        if (newStoneX == Integer.parseInt(lastMoveSplit[1]) && newStoneY == Integer.parseInt(lastMoveSplit[2])) {
             return false;
         }
 
@@ -165,5 +166,20 @@ public class Board implements IBoard {
                 }
             }
         }
+    }
+
+    @Override
+    public void addErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    @Override
+    public EPointColor getBoardPoint(int x, int y) {
+        return boardPoints[x][y];
+    }
+
+    @Override
+    public EPointColor[][] getBoardPoints() {
+        return boardPoints;
     }
 }

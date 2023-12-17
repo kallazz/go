@@ -15,6 +15,7 @@ public class ChainOfStones implements IChainOfStones {
         return true;
     }
 
+    @Override
     public void addStone(Stone stone) {
         stones.add(stone);
     }

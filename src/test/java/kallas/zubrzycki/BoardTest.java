@@ -9,8 +9,9 @@ public class BoardTest {
 
     @Test
     public void shouldArrayGetInitializedCorrectly() {
-        final Board board = new Board(BOARD_SIZE);
-        final EPointColor[][] boardPoints = Board.getBoardPoints();
+        final Board board = Board.getInstance();
+        board.initialize(BOARD_SIZE);
+        final EPointColor[][] boardPoints = board.getBoardPoints();
 
         for (int i = 1; i <= BOARD_SIZE; i++) {
             for (int j = 1; j <= BOARD_SIZE; j++) {
@@ -28,26 +29,29 @@ public class BoardTest {
 
     @Test
     public void shouldCheckWrongMove() {
-        final Board board = new Board(BOARD_SIZE);
+        final Board board = Board.getInstance();
+        board.initialize(BOARD_SIZE);
         assertEquals(false, board.checkMove(0, BOARD_SIZE + 1, EPointColor.BLACK));
     }
 
     @Test
     public void shouldCheckCorrectMove() {
-        final Board board = new Board(BOARD_SIZE);
+        final Board board = Board.getInstance();
+        board.initialize(BOARD_SIZE);
         assertEquals(true, board.checkMove(1, BOARD_SIZE, EPointColor.BLACK));
     }
 
     @Test
     public void shouldUpdateBoard() {
-        final Board board = new Board(BOARD_SIZE);
+        final Board board = Board.getInstance();
+        board.initialize(BOARD_SIZE);
         EPointColor[][] boardPoints;
 
         board.updateBoard(2, 3, EPointColor.BLACK);
-        boardPoints = Board.getBoardPoints();
+        boardPoints = board.getBoardPoints();
         assertEquals(EPointColor.BLACK, boardPoints[2][3]);
         board.updateBoard(2, 3, EPointColor.WHITE);
-        boardPoints = Board.getBoardPoints();
+        boardPoints = board.getBoardPoints();
         assertEquals(EPointColor.WHITE, boardPoints[2][3]);
     }
 }

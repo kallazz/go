@@ -14,8 +14,9 @@ public class GameManager implements IGameManager {
 
     @Override
     public void initializeGame() {
-        board = new Board(BOARD_SIZE);
-        gameHistory = new GameHistory();
+        board = Board.getInstance();
+        board.initialize(BOARD_SIZE);
+        gameHistory = GameHistory.getInstance();
         player1 = new Player(EPointColor.BLACK);
         player2 = new Player(EPointColor.WHITE);
         currentPlayer = player1;

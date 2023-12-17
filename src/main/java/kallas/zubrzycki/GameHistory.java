@@ -1,6 +1,7 @@
 package kallas.zubrzycki;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,8 +10,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class GameHistory {
-    public GameHistory() {
+// Singleton class
+public class GameHistory implements IGameHistory {
+    private static volatile GameHistory instance = null;
+
+    private GameHistory() {
         final Path path = Paths.get("./database.txt");
         try {
             if (Files.exists(path)) {
@@ -23,21 +27,36 @@ public class GameHistory {
         }
     }
 
+    public static GameHistory getInstance() {
+        if (instance == null) {
+            synchronized (GameHistory.class) {
+                if (instance == null) {
+                    instance = new GameHistory();
+                }
+            }
+        }
+        return instance;
+    }
+
+    @Override
     public void addToDatabase(String move) {
         try {
-            final FileWriter writer = new FileWriter("database" + ".txt", true);
-            writer.write(move + '\n');
-            writer.close();
+            final FileWriter fileWriter = new FileWriter("./database.txt", true);
+            final BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(move + '\n');
+            bufferedWriter.close();
+            fileWriter.close();
         } catch (IOException e) {
             System.out.println("Error occurred: " + e.getMessage());
         }
     }
 
-    public static String getPreviousMove(int index) {
+    @Override
+    public String getPreviousMove(int index) {
         ArrayList<String> moves = new ArrayList<String>();
 
         try {
-            final FileReader fileReader = new FileReader("database" + ".txt");
+            final FileReader fileReader = new FileReader("./database.txt");
             final BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             String line;
@@ -50,6 +69,16 @@ public class GameHistory {
             if (moves.size() - 1 - index < 0 || moves.size() - 1 - index > moves.size() - 1) {
                 return "";
             }
+
+            // Look for an actual move, not a pass
+            while (moves.get(moves.size() - 1 - index).equals("pass")) {
+                index += 2;
+
+                if (moves.size() - 1 - index < 0 || moves.size() - 1 - index > moves.size() - 1) {
+                    return "";
+                }
+            };
+
             return moves.get(moves.size() - 1 - index);
         } catch (IOException e) {
             System.out.println("Error occurred: " + e.getMessage());
