@@ -61,11 +61,11 @@ public class Board implements IBoard {
         for (int i = 1; i <= size; i++) {
             for (int j = 1; j <= size; j++) {
                 if (boardPoints[j][i] == EPointColor.NONE) {
-                    System.out.print('+');
+                    System.out.print(" + ");
                 } else if (boardPoints[j][i] == EPointColor.BLACK) {
-                    System.out.print("\u001B[34m●\u001B[0m");
+                    System.out.print("\u001B[34m ● \u001B[0m");
                 } else if (boardPoints[j][i] == EPointColor.WHITE) {
-                    System.out.print("\u001B[33m●\u001B[0m");
+                    System.out.print("\u001B[33m ● \u001B[0m");
                 }
             }
             System.out.print('\n');
@@ -137,8 +137,12 @@ public class Board implements IBoard {
     }
 
     private void calculateChains(Stone stone, ChainOfStones chain) {
+        if(stone.isVisited()){
+            return;
+        }
         chain.addStone(stone);
         stone.setChain(chain);
+        stone.setVisited(true);
 
         final int currentX = stone.getX();
         final int currentY = stone.getY();
@@ -166,6 +170,10 @@ public class Board implements IBoard {
                 }
             }
         }
+    }
+
+    public Stone[][] getStones(){
+        return stones;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package kallas.zubrzycki;
 
+import java.util.ArrayList;
+
 public class GameManager implements IGameManager {
     private static int BOARD_SIZE = 19;
 
@@ -29,9 +31,30 @@ public class GameManager implements IGameManager {
 
             board.printBoard();
             processInput();
+            checkForCaptures();
             
 
             currentPlayer = (player1 == currentPlayer) ? player2 : player1;
+        }
+    }
+
+    private void checkForCaptures(){
+        ArrayList<ChainOfStones> chains = new ArrayList<>();
+        for(int i = 0; i < BOARD_SIZE + 2; i++){
+            for(int j = 0; j < BOARD_SIZE + 2; j++){
+                if(!chains.contains(board.getStones()[i][j].getChain())){
+                    chains.add(board.getStones()[i][j].getChain());
+                }
+            }
+        }
+
+        for(ChainOfStones chain : chains){
+            if(!(chain == null)){
+                if(chain.willBeCaptured()){
+                    currentPlayer.addCapturedStones(chain.size());
+                    chain.becomeCaptured();
+                }
+            }
         }
     }
 

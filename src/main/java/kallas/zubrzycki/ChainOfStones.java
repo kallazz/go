@@ -15,6 +15,15 @@ public class ChainOfStones implements IChainOfStones {
         return true;
     }
 
+    public void becomeCaptured(){
+        for (Stone stone : stones){
+            stone.setColor(EPointColor.NONE);
+        }
+    }
+
+    public int size(){
+        return stones.size();
+    }
     @Override
     public void addStone(Stone stone) {
         stones.add(stone);

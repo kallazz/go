@@ -5,11 +5,20 @@ public class Stone implements IStone {
     private int x;
     private int y;
     private ChainOfStones chain;
+    private boolean visited;
 
     public Stone(int x, int y, EPointColor color) {
         this.x = x;
         this.y = y;
         this.color = color;
+    }
+
+    public boolean isVisited(){
+        return visited;
+    }
+
+    public void setVisited(boolean v){
+        this.visited = v;
     }
 
     @Override
