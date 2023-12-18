@@ -25,9 +25,18 @@ public class GameManager implements IGameManager {
     @Override
     public void startGameLoop() {
         while (!(isPassedPlayer1 && isPassedPlayer2)) {
-            board.printBoard();
 
-            boolean isInputCorrect = false;
+
+            board.printBoard();
+            processInput();
+            
+
+            currentPlayer = (player1 == currentPlayer) ? player2 : player1;
+        }
+    }
+
+    private void processInput(){
+        boolean isInputCorrect = false;
             String input;
             do {
                 input = currentPlayer.readInput();
@@ -62,9 +71,6 @@ public class GameManager implements IGameManager {
                     isPassedPlayer2 = true;
                 }
             }
-
-            currentPlayer = (player1 == currentPlayer) ? player2 : player1;
-        }
     }
 
     private boolean parseInput(String input) {
