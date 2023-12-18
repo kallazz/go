@@ -39,7 +39,7 @@ public class Stone implements IStone {
 
     @Override
     public boolean doesExist() {
-        return color == EPointColor.NONE ? false : true;
+        return (color == EPointColor.NONE || color == EPointColor.BORDER) ? false : true;
     }
 
     @Override
@@ -65,5 +65,9 @@ public class Stone implements IStone {
     @Override
     public void setChain(ChainOfStones chain) {
         this.chain = chain;
+    }
+
+    public void setColor(EPointColor color) {
+        this.color = color;
     }
 }
