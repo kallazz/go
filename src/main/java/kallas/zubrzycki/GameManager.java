@@ -13,12 +13,12 @@ public class GameManager implements IGameManager {
     private boolean isPassedPlayer2 = false;
 
     @Override
-    public void initializeGame() {
+    public void initializeGame(int player1Id, int player2Id) {
         board = Board.getInstance();
         board.initialize(BOARD_SIZE);
         gameHistory = GameHistory.getInstance();
-        player1 = new Player(EPointColor.BLACK);
-        player2 = new Player(EPointColor.WHITE);
+        player1 = new Player(EPointColor.BLACK, player1Id);
+        player2 = new Player(EPointColor.WHITE, player2Id);
         currentPlayer = player1;
     }
 
