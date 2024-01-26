@@ -1,5 +1,10 @@
 package kallas.zubrzycki;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class Board implements IBoard {
     private static volatile Board instance = null;
     private Stone[][] stones;
@@ -276,5 +281,43 @@ public class Board implements IBoard {
     @Override
     public Stone[][] getBoardPoints() {
         return stones;
+    }
+
+    public List<List<Stone>> findTerritories(EPointColor targetColor){
+        List<List<Stone>> territories = new ArrayList<>();
+        Set<Stone> visited = new HashSet<>();
+
+        for(int x = 1; x <= size; x++) {
+            for(int y = 1; y<= size; y++) {
+                Stone stone = stones[x][y];
+                if(stone.getColor() == EPointColor.NONE && !visited.contains(stone)) {
+                    List<Stone> group = new ArrayList<>();
+                    if(isTerritorySurrounded(stone, targetColor, visited, group)){
+                        territories.add(group);
+                    }
+                }
+            }
+        }
+        return territories;
+    }
+
+    private boolean isTerritorySurrounded(Stone stone, EPointColor targetColor, Set<Stone> visited, List<Stone> group){
+        if (!stone.doesExist() || visited.contains(stone)) {
+            return true;
+        }
+        if(stone.getColor() != EPointColor.NONE) {
+            return stone.getColor() == targetColor || stone.getColor() == EPointColor.BORDER;
+        }
+        visited.add(stone);
+        group.add(stone);
+        boolean surrounded = true;
+        int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+        for(int[] dir : directions) {
+            Stone nextStone = getBoardPoint(stone.getX() + dir[0], stone.getY() + dir[1]);
+            if (nextStone != null && !isTerritorySurrounded(nextStone, targetColor, visited, group)) {
+                surrounded = false;
+            }
+        }
+        return surrounded;
     }
 }
