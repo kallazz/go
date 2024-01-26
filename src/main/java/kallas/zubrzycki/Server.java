@@ -87,8 +87,6 @@ public class Server {
                     }
 
                 }
-
-                
             } catch (IOException e) {
                 System.out.println("Error when running ClientHandler");
                 e.printStackTrace();

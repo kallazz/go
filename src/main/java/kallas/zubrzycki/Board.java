@@ -90,11 +90,6 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void updateBoard(int x, int y, EPointColor state) {
-
-    }
-
-    @Override
     public void performMove(int x, int y, EPointColor playerColor) {
         stones[x][y] = new Stone(x, y, playerColor);
         checkForCaptures(stones, playerColor);
@@ -272,12 +267,12 @@ public class Board implements IBoard {
 
 
     @Override
-    public EPointColor getBoardPoint(int x, int y) {
-        return boardPoints[x][y];
+    public Stone getBoardPoint(int x, int y) {
+        return stones[x][y];
     }
 
     @Override
-    public EPointColor[][] getBoardPoints() {
-        return boardPoints;
+    public Stone[][] getBoardPoints() {
+        return stones;
     }
 }

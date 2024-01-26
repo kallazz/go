@@ -76,55 +76,6 @@ public class GameManager implements IGameManager {
 
     }
 
-    public void startGameLoop() {
-        while (!(isPassedPlayer1 && isPassedPlayer2)) {
-
-
-            board.printBoard();
-            processInput();
-
-            currentPlayer = (player1 == currentPlayer) ? player2 : player1;
-        }
-    }
-
-    private void processInput() {
-        boolean isInputCorrect = false;
-        String input;
-        do {
-            input = currentPlayer.readInput();
-            isInputCorrect = parseInput(input);
-
-            board.printBoard();
-        } while (!isInputCorrect);
-
-        if (!input.equals("pass")) {
-            final int x = Integer.parseInt(input.split(" ")[1]);
-            final int y = Integer.parseInt(input.split(" ")[2]);
-
-            if (board.checkMove(x, y, currentPlayer.getColor())) {
-                board.performMove(x, y, currentPlayer.getColor());
-                gameHistory.addToDatabase(input);
-
-                // Reset this player's pass status
-                if (currentPlayer == player1) {
-                    isPassedPlayer1 = false;
-                } else {
-                    isPassedPlayer2 = false;
-                }
-            } else {
-                board.addErrorMessage("Wrong move - you lose your turn");
-            }
-        } else { // Here is what happens when a player types "pass"
-            gameHistory.addToDatabase(input);
-
-            if (currentPlayer == player1) {
-                isPassedPlayer1 = true;
-            } else {
-                isPassedPlayer2 = true;
-            }
-        }
-    }
-
     private boolean parseInput(String input) {
         if (input.equals("pass")) {
             return true;
