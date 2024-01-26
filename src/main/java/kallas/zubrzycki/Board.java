@@ -90,9 +90,15 @@ public class Board implements IBoard {
     }
 
     @Override
+    public void updateBoard(int x, int y, EPointColor state) {
+
+    }
+
+    @Override
     public void performMove(int x, int y, EPointColor playerColor) {
         stones[x][y] = new Stone(x, y, playerColor);
-        checkForCaptures(stones, playerColor);
+        calculateChains2(stones);
+        checkForCaptures(stones, playerColor == EPointColor.WHITE ? EPointColor.BLACK : EPointColor.WHITE);
     }
 
     @Override
@@ -162,7 +168,9 @@ public class Board implements IBoard {
                     if(stone.getChain().countLiberties(allStones) == 0){
                         anyCaptures = true;
                         for(Stone capturedStone : stone.getChain().stones) {
-                            capturedStone.setColor(EPointColor.NONE);
+                            stones[capturedStone.getX()][capturedStone.getY()].setColor(EPointColor.NONE);
+                            capturedStone.getChain().becomeCaptured();
+                            stones[capturedStone.getX()][capturedStone.getY()].setChain(null);
                         }
                     }
                 }
