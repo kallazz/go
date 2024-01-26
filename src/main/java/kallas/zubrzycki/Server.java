@@ -39,7 +39,12 @@ public class Server {
 
         System.out.println("2 players connected. The game is starting");
         isGameStarted = true;
-        gameManager.initializeGame(clientHandlers.get(0).getClientId(), clientHandlers.get(1).getClientId());
+
+        int firstPlayerId = clientHandlers.get(0).getPlayerId();
+        int secondPlayerId = clientHandlers.get(1).getPlayerId();
+        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers.get(0), firstPlayerId));
+        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers.get(1), secondPlayerId));
+        gameManager.initializeGame(firstPlayerId, secondPlayerId);
         while (true) {
             // TODO: Finish
         }
@@ -59,31 +64,34 @@ public class Server {
 
     private class ClientHandler extends Thread {
         private Socket clientSocket;
-
         private int id;
+        private BufferedReader userInput;
+        private PrintWriter userOutput;
 
         public ClientHandler(Socket socket, int id) {
             this.clientSocket = socket;
             this.id = id;
         }
 
-        public int getClientId() {
+        public int getPlayerId() {
             return this.id;
+        }
+
+        public void printBoard(String board) {
+            userOutput.println(board + "\u0004");
         }
 
         public void run() {
             try {
-                BufferedReader userInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                PrintWriter userOutput = new PrintWriter(clientSocket.getOutputStream(), true);
+                userInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                userOutput = new PrintWriter(clientSocket.getOutputStream(), true);
 
                 String inputLine;
                 while ((inputLine = userInput.readLine()) != null) {
                     if (!isGameStarted) {
-                        System.out.println("fuk");
-                        userOutput.println("The game hasn't started yet!\n\u0004"); // TODO: Find a normal way to do this
+                        userOutput.println("The game hasn't started yet!\u0004"); // TODO: Find a normal way to do this
                     } else {
-                        String board = gameManager.makeMove(inputLine, id);
-                        userOutput.println(board + "\n\u0004");
+                        gameManager.makeMove(inputLine, id);
                     }
 
                 }
@@ -91,6 +99,22 @@ public class Server {
                 System.out.println("Error when running ClientHandler");
                 e.printStackTrace();
             }
+        }
+    }
+
+
+    private class GameManagerObserver implements IObserver {
+        private GameManager gameManager;
+        private ClientHandler clientHandler;
+
+        public GameManagerObserver(GameManager gameManager, ClientHandler clientHandler, int playerId) {
+            this.gameManager = gameManager;
+            this.clientHandler = clientHandler;
+        }
+
+        @Override
+        public void update() {
+            clientHandler.printBoard(gameManager.getBoard(clientHandler.getPlayerId()));
         }
     }
 }

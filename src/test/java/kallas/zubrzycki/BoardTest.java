@@ -31,14 +31,14 @@ public class BoardTest {
     public void shouldCheckWrongMove() {
         final Board board = Board.getInstance();
         board.initialize(BOARD_SIZE);
-        assertEquals(false, board.checkMove(0, BOARD_SIZE + 1, EPointColor.BLACK));
+        assertEquals(false, board.checkMove(0, BOARD_SIZE + 1, EPointColor.BLACK, 1));
     }
 
     @Test
     public void shouldCheckCorrectMove() {
         final Board board = Board.getInstance();
         board.initialize(BOARD_SIZE);
-        assertEquals(true, board.checkMove(1, BOARD_SIZE, EPointColor.BLACK));
+        assertEquals(true, board.checkMove(1, BOARD_SIZE, EPointColor.BLACK, 1));
     }
 
     @Test
