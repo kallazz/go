@@ -1,7 +1,7 @@
 package kallas.zubrzycki;
 
 public class GameManager implements IGameManager {
-    private static int BOARD_SIZE = 19;
+    private static int BOARD_SIZE = 6;
 
     private Board board;
     private GameHistory gameHistory;

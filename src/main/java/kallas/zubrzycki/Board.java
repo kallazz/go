@@ -77,14 +77,16 @@ public class Board implements IBoard {
             errorMessage = "";
         }
 
-        for (int i = 1; i <= size; i++) {
-            for (int j = 1; j <= size; j++) {
-                if (boardPoints[j][i] == EPointColor.NONE) {
-                    output += '+';
-                } else if (boardPoints[j][i] == EPointColor.BLACK) {
-                    output += "\u001B[34m●\u001B[0m";
-                } else if (boardPoints[j][i] == EPointColor.WHITE) {
-                    output += "\u001B[33m●\u001B[0m";
+        for (int i = 0; i <= size + 1; i++) {
+            for (int j = 0; j <= size + 1; j++) {
+                if (stones[j][i].getColor() == EPointColor.NONE) {
+                    output += " + ";
+                } else if (stones[j][i].getColor() == EPointColor.BLACK) {
+                    output += "\u001B[34m ● \u001B[0m";
+                } else if (stones[j][i].getColor() == EPointColor.WHITE) {
+                    output += "\u001B[33m ● \u001B[0m";
+                } else if (stones[j][i].getColor() == EPointColor.BORDER) {
+                    output += " X ";
                 }
             }
             output += '\n';
