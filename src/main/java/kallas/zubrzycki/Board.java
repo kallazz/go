@@ -47,29 +47,30 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void printBoard() {
+    public String getBoardView() {
         // Clear the console
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+        String output = "\033[H\033[2J";
+        //System.out.flush();
 
         // Print errors
         if (!errorMessage.equals("")) {
-            System.out.println("\u001b[31m" + errorMessage + "\u001B[0m");
+            output += "\n\u001b[31m" + errorMessage + "\u001B[0m\n";
             errorMessage = "";
         }
 
         for (int i = 1; i <= size; i++) {
             for (int j = 1; j <= size; j++) {
                 if (boardPoints[j][i] == EPointColor.NONE) {
-                    System.out.print('+');
+                    output += '+';
                 } else if (boardPoints[j][i] == EPointColor.BLACK) {
-                    System.out.print("\u001B[34m●\u001B[0m");
+                    output += "\u001B[34m●\u001B[0m";
                 } else if (boardPoints[j][i] == EPointColor.WHITE) {
-                    System.out.print("\u001B[33m●\u001B[0m");
+                    output += "\u001B[33m●\u001B[0m";
                 }
             }
-            System.out.print('\n');
+            output += '\n';
         }
+        return output;
     }
 
     @Override

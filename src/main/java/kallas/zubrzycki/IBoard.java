@@ -6,6 +6,6 @@ public interface IBoard {
     public EPointColor getBoardPoint(int x, int y);
     public EPointColor[][] getBoardPoints();
     public void initialize(int size);
-    public void printBoard();
+    public String getBoardView();
     public void updateBoard(int x, int y, EPointColor state);
 }

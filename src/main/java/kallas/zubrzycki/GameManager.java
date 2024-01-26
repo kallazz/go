@@ -23,20 +23,20 @@ public class GameManager implements IGameManager {
     }
 
     @Override
-    public void startGameLoop() {
-        while (!(isPassedPlayer1 && isPassedPlayer2)) {
-            board.printBoard();
+    public synchronized String makeMove(String input, int playerId) {
+        // Quit if it's not this player's turn
+        if (playerId != currentPlayer.getId()) {
+            board.addErrorMessage("This is not your turn!");
+            return board.getBoardView();
+        }
 
-            boolean isInputCorrect = false;
-            String input;
-            do {
-                input = currentPlayer.readInput();
-                isInputCorrect = parseInput(input);
+        // Quit if input is incorrect
+        if (!parseInput(input)) {
+            return board.getBoardView();
+        }
 
-                board.printBoard();
-            } while (!isInputCorrect);
-
-            if (!input.equals("pass")) {
+        // Handle correct input
+        if (!input.equals("pass")) {
                 final int x = Integer.parseInt(input.split(" ")[1]);
                 final int y = Integer.parseInt(input.split(" ")[2]);
 
@@ -63,8 +63,13 @@ public class GameManager implements IGameManager {
                 }
             }
 
+            if (isPassedPlayer1 && isPassedPlayer2) {
+                return "THE GAME IS FINISHED";
+            }
+
             currentPlayer = (player1 == currentPlayer) ? player2 : player1;
-        }
+
+            return board.getBoardView();
     }
 
     private boolean parseInput(String input) {
