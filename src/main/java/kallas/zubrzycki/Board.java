@@ -44,7 +44,6 @@ public class Board implements IBoard {
     }
 
     public void printBoard() {
-
         // Print errors
         if (!errorMessage.equals("")) {
             System.out.println("\u001b[31m" + errorMessage + "\u001B[0m");
@@ -94,8 +93,14 @@ public class Board implements IBoard {
     }
 
     @Override
+    public void updateBoard(int x, int y, EPointColor state) {
+
+    }
+
+    @Override
     public void performMove(int x, int y, EPointColor playerColor) {
         stones[x][y] = new Stone(x, y, playerColor);
+        checkForCaptures(stones, playerColor);
     }
 
     @Override
