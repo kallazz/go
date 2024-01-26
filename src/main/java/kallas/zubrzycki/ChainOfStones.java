@@ -16,6 +16,7 @@ public class ChainOfStones implements IChainOfStones {
     public void becomeCaptured(){
         for (Stone stone : stones){
             stone.setColor(EPointColor.NONE);
+            stone.setChain(null);
         }
     }
 

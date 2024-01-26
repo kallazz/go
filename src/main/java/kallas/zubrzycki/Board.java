@@ -1,14 +1,10 @@
 package kallas.zubrzycki;
 
-import java.util.ArrayList;
-
 public class Board implements IBoard {
     private static volatile Board instance = null;
 
     private EPointColor[][] boardPoints;
     private Stone[][] stones;
-    private ArrayList<Stone> stoneArrayList;
-
     private int size;
     private String errorMessage = "";
 
@@ -47,7 +43,6 @@ public class Board implements IBoard {
         }
     }
 
-    @Override
     public void printBoard() {
 
         // Print errors
@@ -70,6 +65,32 @@ public class Board implements IBoard {
             }
             System.out.print('\n');
         }
+    }
+
+    public String getBoardView() {
+        // Clear the console
+        String output = "\033[H\033[2J";
+        //System.out.flush();
+
+        // Print errors
+        if (!errorMessage.equals("")) {
+            output += "\n\u001b[31m" + errorMessage + "\u001B[0m\n";
+            errorMessage = "";
+        }
+
+        for (int i = 1; i <= size; i++) {
+            for (int j = 1; j <= size; j++) {
+                if (boardPoints[j][i] == EPointColor.NONE) {
+                    output += '+';
+                } else if (boardPoints[j][i] == EPointColor.BLACK) {
+                    output += "\u001B[34m●\u001B[0m";
+                } else if (boardPoints[j][i] == EPointColor.WHITE) {
+                    output += "\u001B[33m●\u001B[0m";
+                }
+            }
+            output += '\n';
+        }
+        return output;
     }
 
     @Override
@@ -207,7 +228,6 @@ public class Board implements IBoard {
 
         chain.addStone(stone);
         stone.setChain(chain);
-        stone.setVisited(true);
 
         final int currentX = stone.getX();
         final int currentY = stone.getY();
@@ -237,14 +257,15 @@ public class Board implements IBoard {
         }
     }
 
-    public Stone[][] getStones(){
-        return stones;
-    }
-
     @Override
     public void addErrorMessage(String errorMessage) {
         this.errorMessage += errorMessage;
     }
+
+    public Stone[][] getStones(){
+        return stones;
+    }
+
 
     @Override
     public EPointColor getBoardPoint(int x, int y) {

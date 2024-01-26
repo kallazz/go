@@ -8,4 +8,6 @@ public interface IBoard {
     public void initialize(int size);
     public void printBoard();
     public void performMove(int x, int y, EPointColor state);
+    public String getBoardView();
+    public void updateBoard(int x, int y, EPointColor state);
 }

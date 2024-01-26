@@ -1,9 +1,7 @@
 package kallas.zubrzycki;
 
-import java.util.ArrayList;
-
 public class GameManager implements IGameManager {
-    private static int BOARD_SIZE = 5;
+    private static int BOARD_SIZE = 19;
 
     private Board board;
     private GameHistory gameHistory;
@@ -15,16 +13,62 @@ public class GameManager implements IGameManager {
     private boolean isPassedPlayer2 = false;
 
     @Override
-    public void initializeGame() {
-
+    public void initializeGame(int player1Id, int player2Id) {
         board = Board.getInstance();
         board.initialize(BOARD_SIZE);
-
         gameHistory = GameHistory.getInstance();
-        player1 = new Player(EPointColor.BLACK);
-        player2 = new Player(EPointColor.WHITE);
-
+        player1 = new Player(EPointColor.BLACK, player1Id);
+        player2 = new Player(EPointColor.WHITE, player2Id);
         currentPlayer = player1;
+    }
+    @Override
+    public synchronized String makeMove(String input, int playerId) {
+        // Quit if it's not this player's turn
+        if (playerId != currentPlayer.getId()) {
+            board.addErrorMessage("This is not your turn!");
+            return board.getBoardView();
+        }
+
+        // Quit if input is incorrect
+        if (!parseInput(input)) {
+            return board.getBoardView();
+        }
+
+        // Handle correct input
+        if (!input.equals("pass")) {
+            final int x = Integer.parseInt(input.split(" ")[1]);
+            final int y = Integer.parseInt(input.split(" ")[2]);
+
+            if (board.checkMove(x, y, currentPlayer.getColor())) {
+                board.updateBoard(x, y, currentPlayer.getColor());
+                gameHistory.addToDatabase(input);
+
+                // Reset this player's pass status
+                if (currentPlayer == player1) {
+                    isPassedPlayer1 = false;
+                } else {
+                    isPassedPlayer2 = false;
+                }
+            } else {
+                board.addErrorMessage("Wrong move - you lose your turn");
+            }
+        } else {
+            gameHistory.addToDatabase(input);
+
+            if (currentPlayer == player1) {
+                isPassedPlayer1 = true;
+            } else {
+                isPassedPlayer2 = true;
+            }
+        }
+
+        if (isPassedPlayer1 && isPassedPlayer2) {
+            return "THE GAME IS FINISHED";
+        }
+
+        currentPlayer = (player1 == currentPlayer) ? player2 : player1;
+
+        return board.getBoardView();
     }
 
     @Override
@@ -34,14 +78,9 @@ public class GameManager implements IGameManager {
 
             board.printBoard();
             processInput();
-            checkForCaptures();
 
             currentPlayer = (player1 == currentPlayer) ? player2 : player1;
         }
-    }
-
-    private void checkForCaptures(){
-
     }
 
     private void processInput(){
@@ -51,17 +90,14 @@ public class GameManager implements IGameManager {
                 input = currentPlayer.readInput();
                 isInputCorrect = parseInput(input);
 
-                //board.printBoard();
+                board.printBoard();
             } while (!isInputCorrect);
 
             if (!input.equals("pass")) {
-
                 final int x = Integer.parseInt(input.split(" ")[1]);
                 final int y = Integer.parseInt(input.split(" ")[2]);
 
                 if (board.checkMove(x, y, currentPlayer.getColor())) {
-
-
                     board.performMove(x, y, currentPlayer.getColor());
                     gameHistory.addToDatabase(input);
 
@@ -83,6 +119,7 @@ public class GameManager implements IGameManager {
                     isPassedPlayer2 = true;
                 }
             }
+        }
     }
 
     private boolean parseInput(String input) {
@@ -112,8 +149,4 @@ public class GameManager implements IGameManager {
         return false;
     }
 
-    @Override
-    public void countScore() {
-
-    }
 }
