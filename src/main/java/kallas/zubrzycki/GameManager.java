@@ -3,7 +3,7 @@ package kallas.zubrzycki;
 import java.util.ArrayList;
 
 public class GameManager implements IGameManager {
-    private static int BOARD_SIZE = 19;
+    private static int BOARD_SIZE = 5;
 
     private Board board;
     private GameHistory gameHistory;
@@ -16,11 +16,14 @@ public class GameManager implements IGameManager {
 
     @Override
     public void initializeGame() {
+
         board = Board.getInstance();
         board.initialize(BOARD_SIZE);
+
         gameHistory = GameHistory.getInstance();
         player1 = new Player(EPointColor.BLACK);
         player2 = new Player(EPointColor.WHITE);
+
         currentPlayer = player1;
     }
 
@@ -32,30 +35,13 @@ public class GameManager implements IGameManager {
             board.printBoard();
             processInput();
             checkForCaptures();
-            
 
             currentPlayer = (player1 == currentPlayer) ? player2 : player1;
         }
     }
 
     private void checkForCaptures(){
-        ArrayList<ChainOfStones> chains = new ArrayList<>();
-        for(int i = 0; i < BOARD_SIZE + 2; i++){
-            for(int j = 0; j < BOARD_SIZE + 2; j++){
-                if(!chains.contains(board.getStones()[i][j].getChain())){
-                    chains.add(board.getStones()[i][j].getChain());
-                }
-            }
-        }
 
-        for(ChainOfStones chain : chains){
-            if(!(chain == null)){
-                if(chain.willBeCaptured()){
-                    currentPlayer.addCapturedStones(chain.size());
-                    chain.becomeCaptured();
-                }
-            }
-        }
     }
 
     private void processInput(){
@@ -65,15 +51,18 @@ public class GameManager implements IGameManager {
                 input = currentPlayer.readInput();
                 isInputCorrect = parseInput(input);
 
-                board.printBoard();
+                //board.printBoard();
             } while (!isInputCorrect);
 
             if (!input.equals("pass")) {
+
                 final int x = Integer.parseInt(input.split(" ")[1]);
                 final int y = Integer.parseInt(input.split(" ")[2]);
 
                 if (board.checkMove(x, y, currentPlayer.getColor())) {
-                    board.updateBoard(x, y, currentPlayer.getColor());
+
+
+                    board.performMove(x, y, currentPlayer.getColor());
                     gameHistory.addToDatabase(input);
 
                     // Reset this player's pass status
@@ -85,7 +74,7 @@ public class GameManager implements IGameManager {
                 } else {
                     board.addErrorMessage("Wrong move - you lose your turn");
                 }
-            } else {
+            } else { // Here is what happens when a player types "pass"
                 gameHistory.addToDatabase(input);
 
                 if (currentPlayer == player1) {

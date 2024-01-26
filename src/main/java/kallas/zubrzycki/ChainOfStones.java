@@ -5,14 +5,12 @@ import java.util.ArrayList;
 public class ChainOfStones implements IChainOfStones {
     ArrayList<Stone> stones = new ArrayList<Stone>();
 
-    @Override
-    public boolean willBeCaptured() {
-        for (Stone stone: stones) {
-            if (stone.areLibertiesAvailible()) {
-                return false;
-            }
+    public int countLiberties(Stone[][] allStones){
+        int liberties = 0;
+        for(Stone stone : stones) {
+            liberties += stone.countLiberties(allStones);
         }
-        return true;
+        return liberties;
     }
 
     public void becomeCaptured(){

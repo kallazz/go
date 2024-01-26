@@ -22,28 +22,23 @@ public class Stone implements IStone {
     }
 
     @Override
-    public boolean areLibertiesAvailible() {
+    public int countLiberties(Stone[][] boardPoints) {
         int liberties = 0;
-        Board board = Board.getInstance();
 
-        if (board.getBoardPoint(x, y + 1) == EPointColor.NONE || board.getBoardPoint(x, y + 1) == color) {
+        if (boardPoints[x][y+1].getColor() == EPointColor.NONE) {
             liberties++;
         }
-        if (board.getBoardPoint(x, y - 1) == EPointColor.NONE || board.getBoardPoint(x, y - 1) == color) {
+        if (boardPoints[x][y-1].getColor() == EPointColor.NONE) {
             liberties++;
         }
-        if (board.getBoardPoint(x + 1, y) == EPointColor.NONE || board.getBoardPoint(x + 1, y) == color) {
+        if (boardPoints[x+1][y].getColor() == EPointColor.NONE) {
             liberties++;
         }
-        if (board.getBoardPoint(x - 1, y) == EPointColor.NONE || board.getBoardPoint(x - 1, y) == color) {
+        if (boardPoints[x-1][y].getColor() == EPointColor.NONE) {
             liberties++;
         }
 
-        if (liberties > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return liberties;
     }
 
     @Override

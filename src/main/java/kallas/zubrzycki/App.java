@@ -12,5 +12,6 @@ public class App
 
         gameManager.initializeGame();
         gameManager.startGameLoop();
+        gameManager.countScore();
     }
 }

@@ -1,7 +1,7 @@
 package kallas.zubrzycki;
 
 public interface IStone {
-    public boolean areLibertiesAvailible();
+    public int countLiberties(Stone[][] boardPoints);
     public boolean doesExist();
     public ChainOfStones getChain();
     public EPointColor getColor();

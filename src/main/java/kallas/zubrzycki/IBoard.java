@@ -7,5 +7,5 @@ public interface IBoard {
     public EPointColor[][] getBoardPoints();
     public void initialize(int size);
     public void printBoard();
-    public void updateBoard(int x, int y, EPointColor state);
+    public void performMove(int x, int y, EPointColor state);
 }
