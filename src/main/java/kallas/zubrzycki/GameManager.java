@@ -1,21 +1,51 @@
 package kallas.zubrzycki;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 public class GameManager implements IGameManager {
     private static int BOARD_SIZE = 6;
 
     private Board board;
     private GameHistory gameHistory;
+    private SQLLiteJDBC db;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
+    private int game_id;
+    private int current_turn;
 
     private boolean isPassedPlayer1 = false;
     private boolean isPassedPlayer2 = false;
 
+
+    int obtainGameId(SQLLiteJDBC db) throws SQLException {
+
+        Statement statement = db.getConnection().createStatement();
+        String query = "SELECT MAX(game_id) AS max_value FROM go";
+        ResultSet resultSet = statement.executeQuery(query);
+
+        if (resultSet.next()) {
+            int highestValue = resultSet.getInt("max_value");
+            return highestValue + 1;
+        }
+        return 1;
+    }
+
     @Override
     public void initializeGame(int player1Id, int player2Id) {
+
+        try {
+            db = new SQLLiteJDBC("jdbc:sqlite:database.db");
+            game_id = obtainGameId(db);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         board = Board.getInstance();
         board.initialize(BOARD_SIZE);
+        current_turn = 0;
         gameHistory = GameHistory.getInstance();
         player1 = new Player(EPointColor.BLACK, player1Id);
         player2 = new Player(EPointColor.WHITE, player2Id);
@@ -40,8 +70,14 @@ public class GameManager implements IGameManager {
             final int y = Integer.parseInt(input.split(" ")[2]);
 
             if (board.checkMove(x, y, currentPlayer.getColor())) {
+
+                try {
+                    db.insertNewMove(game_id, current_turn, input);
+                    current_turn++;
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 board.performMove(x, y, currentPlayer.getColor());
-                gameHistory.addToDatabase(input);
 
                 // Reset this player's pass status
                 if (currentPlayer == player1) {
@@ -53,7 +89,13 @@ public class GameManager implements IGameManager {
                 board.addErrorMessage("Wrong move - you lose your turn");
             }
         } else {
-            gameHistory.addToDatabase(input);
+
+            try {
+                db.insertNewMove(game_id, current_turn, input);
+                current_turn++;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
             if (currentPlayer == player1) {
                 isPassedPlayer1 = true;

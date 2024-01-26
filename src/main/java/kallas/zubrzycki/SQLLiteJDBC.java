@@ -3,6 +3,10 @@ package kallas.zubrzycki;
 import java.sql.*;
 
 public class SQLLiteJDBC {
+    public Connection getConnection() {
+        return connection;
+    }
+
     Connection connection = null;
 
     public void initialize() throws SQLException {
@@ -11,7 +15,7 @@ public class SQLLiteJDBC {
     }
 
     public void createNewGame() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS go (game_id integer PRIMARY KEY, move_number integer, move_text VARCHAR(8))";
+        String sql = "CREATE TABLE IF NOT EXISTS go (game_id integer, move_number integer, move_text VARCHAR(8))";
         Statement stmt = connection.createStatement();
         stmt.execute(sql);
     }
@@ -26,11 +30,14 @@ public class SQLLiteJDBC {
         }
     }
 
+    SQLLiteJDBC(String url) throws SQLException {
+        this.connection = DriverManager.getConnection(url);
+    }
+
 
     public static void main(String[] args) throws SQLException {
-        SQLLiteJDBC db = new SQLLiteJDBC();
+        SQLLiteJDBC db = new SQLLiteJDBC("jdbc:sqlite:database.db");
         db.initialize();
         db.createNewGame();
-        db.insertNewMove(1, 1, "pass");
     }
 }
