@@ -93,7 +93,7 @@ public class Board implements IBoard {
     public void performMove(int x, int y, EPointColor playerColor) {
         stones[x][y] = new Stone(x, y, playerColor);
         calculateChains2(stones);
-        checkForCaptures(stones, playerColor == EPointColor.WHITE ? EPointColor.BLACK : EPointColor.WHITE);
+        checkForCaptures(stones, playerColor);
     }
 
     @Override
@@ -164,7 +164,6 @@ public class Board implements IBoard {
                         anyCaptures = true;
                         for(Stone capturedStone : stone.getChain().stones) {
                             stones[capturedStone.getX()][capturedStone.getY()].setColor(EPointColor.NONE);
-                            capturedStone.getChain().becomeCaptured();
                             stones[capturedStone.getX()][capturedStone.getY()].setChain(null);
                         }
                     }
