@@ -2,8 +2,6 @@ package kallas.zubrzycki;
 
 public class Board implements IBoard {
     private static volatile Board instance = null;
-
-    private EPointColor[][] boardPoints;
     private Stone[][] stones;
     private int size;
     private String errorMessage = "";
@@ -25,9 +23,6 @@ public class Board implements IBoard {
     public void initialize(int size) {
         this.size = size;
         stones = new Stone[size + 2][size + 2];
-
-
-        boardPoints = new EPointColor[size + 2][size + 2];
 
         for (int i = 0; i <= size + 1; i++) {
             for (int j = 0; j <= size + 1; j++) {
@@ -171,7 +166,9 @@ public class Board implements IBoard {
                 if(stone.getChain() != null && stone.getColor() != color){
                     if(stone.getChain().countLiberties(allStones) == 0){
                         anyCaptures = true;
-                        stone.getChain().becomeCaptured();
+                        for(Stone capturedStone : stone.getChain().stones) {
+                            capturedStone.setColor(EPointColor.NONE);
+                        }
                     }
                 }
 
