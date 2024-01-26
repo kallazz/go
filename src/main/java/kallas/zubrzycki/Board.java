@@ -90,11 +90,6 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void updateBoard(int x, int y, EPointColor state) {
-
-    }
-
-    @Override
     public void performMove(int x, int y, EPointColor playerColor) {
         stones[x][y] = new Stone(x, y, playerColor);
         calculateChains2(stones);
