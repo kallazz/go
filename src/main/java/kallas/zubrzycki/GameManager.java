@@ -50,7 +50,9 @@ public class GameManager implements IGameManager {
         player1 = new Player(EPointColor.BLACK, player1Id);
         player2 = new Player(EPointColor.WHITE, player2Id);
         currentPlayer = player1;
+
         try {
+            db = new SQLLiteJDBC("jdbc:sqlite:database.db");
             this.game_id = obtainGameId(db);
         } catch (SQLException e) {
             throw new RuntimeException(e);
