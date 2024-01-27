@@ -15,9 +15,11 @@ public class SQLLiteJDBC {
     }
 
     public void createNewGame() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS go (game_id integer, move_number integer, move_text VARCHAR(8))";
+        String query1 = "CREATE TABLE IF NOT EXISTS moves (game_id integer, move_number integer, move_text VARCHAR(8))";
+        String query2 = "CREATE TABLE IF NOT EXISTS games (game_id integer PRIMARY KEY, winner VARCHAR(5), date DATETIME";
         Statement stmt = connection.createStatement();
-        stmt.execute(sql);
+        stmt.execute(query1);
+        stmt.execute(query2);
     }
 
     public void insertNewMove(int gameId, int moveNumber, String moveText) throws SQLException {

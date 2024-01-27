@@ -105,6 +105,7 @@ public class GameManager implements IGameManager {
         }
 
         if (isPassedPlayer1 && isPassedPlayer2) {
+            countScore();
             return "THE GAME IS FINISHED";
         }
 
@@ -115,7 +116,7 @@ public class GameManager implements IGameManager {
 
     @Override
     public void countScore() {
-
+            
     }
 
     private boolean parseInput(String input) {
