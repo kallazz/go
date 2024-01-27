@@ -10,7 +10,7 @@ public class BoardTest {
     @Test
     public void shouldArrayGetInitializedCorrectly() {
         final Board board = Board.getInstance();
-        board.initialize(BOARD_SIZE);
+        board.initialize(BOARD_SIZE, new GameManager());
         final Stone[][] boardPoints = board.getBoardPoints();
 
         for (int i = 1; i <= BOARD_SIZE; i++) {
@@ -30,21 +30,21 @@ public class BoardTest {
     @Test
     public void shouldCheckWrongMove() {
         final Board board = Board.getInstance();
-        board.initialize(BOARD_SIZE);
+        board.initialize(BOARD_SIZE, new GameManager());
         assertEquals(false, board.checkMove(0, BOARD_SIZE + 1, EPointColor.BLACK, 1));
     }
 
     @Test
     public void shouldCheckCorrectMove() {
         final Board board = Board.getInstance();
-        board.initialize(BOARD_SIZE);
+        board.initialize(BOARD_SIZE, new GameManager());
         assertEquals(true, board.checkMove(1, BOARD_SIZE, EPointColor.BLACK, 1));
     }
 
     @Test
     public void shouldUpdateBoard() {
         final Board board = Board.getInstance();
-        board.initialize(BOARD_SIZE);
+        board.initialize(BOARD_SIZE, new GameManager());
         Stone[][] boardPoints;
 
         board.performMove(2, 3, EPointColor.BLACK);

@@ -5,7 +5,7 @@ public interface IBoard {
     public boolean checkMove(int x, int y, EPointColor playerColor, int playerId);
     public Stone getBoardPoint(int x, int y);
     public Stone[][] getBoardPoints();
-    public void initialize(int size);
+    public void initialize(int size, GameManager gameManager);
     public void performMove(int x, int y, EPointColor state);
     public String getBoardView(int playerId, EPointColor playerColor, EPointColor currentPlayerColor);
 }

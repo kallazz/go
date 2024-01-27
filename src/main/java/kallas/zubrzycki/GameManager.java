@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager implements IGameManager {
-    private static int BOARD_SIZE = 6;
+    private static int BOARD_SIZE = 19;
 
     private Board board;
     private Player player1;
@@ -23,11 +23,14 @@ public class GameManager implements IGameManager {
     private int current_turn;
 
     private List<IGameManagerObserver> observers = new ArrayList<IGameManagerObserver>();
+    public SQLLiteJDBC getDatabase(){
+        return this.db;
+    }
 
     int obtainGameId(SQLLiteJDBC db) throws SQLException {
 
         Statement statement = db.getConnection().createStatement();
-        String query = "SELECT MAX(game_id) AS max_value FROM go";
+        String query = "SELECT MAX(game_id) AS max_value FROM games";
         ResultSet resultSet = statement.executeQuery(query);
 
         if (resultSet.next()) {
@@ -43,10 +46,15 @@ public class GameManager implements IGameManager {
         current_turn = 0;
 
         board = Board.getInstance();
-        board.initialize(BOARD_SIZE);
+        board.initialize(BOARD_SIZE, this);
         player1 = new Player(EPointColor.BLACK, player1Id);
         player2 = new Player(EPointColor.WHITE, player2Id);
         currentPlayer = player1;
+        try {
+            this.game_id = obtainGameId(db);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
     @Override
     public synchronized void makeMove(String input, int playerId) {
@@ -72,6 +80,11 @@ public class GameManager implements IGameManager {
 
 
                 board.performMove(x, y, currentPlayer.getColor());
+                try {
+                    db.insertNewMove(game_id, current_turn, input);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
 
                 // Reset this player's pass status
                 if (currentPlayer == player1) {

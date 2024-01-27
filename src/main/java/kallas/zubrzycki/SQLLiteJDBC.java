@@ -16,7 +16,7 @@ public class SQLLiteJDBC {
 
     public void createNewGame() throws SQLException {
         String query1 = "CREATE TABLE IF NOT EXISTS moves (game_id integer, move_number integer, move_text VARCHAR(8))";
-        String query2 = "CREATE TABLE IF NOT EXISTS games (game_id integer PRIMARY KEY, winner VARCHAR(5), date DATETIME";
+        String query2 = "CREATE TABLE IF NOT EXISTS games (game_id integer PRIMARY KEY, winner VARCHAR(5), date DATETIME)";
         Statement stmt = connection.createStatement();
         stmt.execute(query1);
         stmt.execute(query2);

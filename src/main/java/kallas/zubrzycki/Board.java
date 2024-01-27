@@ -13,6 +13,7 @@ public class Board implements IBoard {
 
     private static volatile Board instance = null;
     private Stone[][] stones;
+    private GameManager gm;
     private int size;
     private String[] errorMessages = {"", ""}; // error messages for player1 and player2
 
@@ -30,7 +31,8 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void initialize(int size) {
+    public void initialize(int size, GameManager gameManager) {
+        this.gm = gameManager;
         this.size = size;
         stones = new Stone[size + 2][size + 2];
 
@@ -82,9 +84,9 @@ public class Board implements IBoard {
                 if (stones[j][i].getColor() == EPointColor.NONE) {
                     output += " + ";
                 } else if (stones[j][i].getColor() == EPointColor.BLACK) {
-                    output += colorBlack + " ● " + colorDefault;
+                    output += colorBlack + " ⬤ " + colorDefault;
                 } else if (stones[j][i].getColor() == EPointColor.WHITE) {
-                    output += colorWhite + " ● " + colorDefault;
+                    output += colorWhite + " ⬤ " + colorDefault;
                 } else if (stones[j][i].getColor() == EPointColor.BORDER) {
                     output += " X ";
                 }
@@ -182,7 +184,7 @@ public class Board implements IBoard {
 
 
     public int simulateNewStoneAndCheckForKORuleViolation(){
-        return 1;
+    return 1;
     }
 
     private void calculateChains2(Stone[][] stones) {
