@@ -29,9 +29,13 @@ public class GameManager implements IGameManager {
 
     int obtainGameId(SQLLiteJDBC db) throws SQLException {
 
+        System.out.println("DUPA 0");
         Statement statement = db.getConnection().createStatement();
+        System.out.println("DUPA 1");
         String query = "SELECT MAX(game_id) AS max_value FROM games";
+        System.out.println("DUPA 2");
         ResultSet resultSet = statement.executeQuery(query);
+        System.out.println("DUPA 3");
 
         if (resultSet.next()) {
             int highestValue = resultSet.getInt("max_value");
@@ -52,8 +56,10 @@ public class GameManager implements IGameManager {
         currentPlayer = player1;
 
         try {
+            System.out.println("DUPA -2");
             db = new SQLLiteJDBC("jdbc:sqlite:database.db");
-            this.game_id = obtainGameId(db);
+            System.out.println("DUPA -1");
+            game_id = obtainGameId(db);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -23,7 +23,7 @@ public class SQLLiteJDBC {
     }
 
     public void insertNewMove(int gameId, int moveNumber, String moveText) throws SQLException {
-        String sql = "INSERT INTO go (game_id, move_number, move_text) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO moves (game_id, move_number, move_text) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, gameId);
             pstmt.setInt(2, moveNumber);
