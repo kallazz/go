@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Set;
 
 public class Board implements IBoard {
+    private static String colorBlack = "\u001B[34m";
+    private static String colorWhite = "\u001B[33m";
+    private static String colorRed = "\u001B[31m";
+    private static String colorDefault = "\u001B[0m";
+
     private static volatile Board instance = null;
     private Stone[][] stones;
     private int size;
@@ -43,15 +48,32 @@ public class Board implements IBoard {
         }
     }
 
-    public String getBoardView(int playerId) {
+    @Override
+    public String getBoardView(int playerId, EPointColor playerColor, EPointColor currentPlayerColor) {
         // Clear the console
         String output = "\033[H\033[2J";
-        //System.out.flush();
+ 
+        // Print info about this player's color and whose turn it is
+        output += "You are playing as ";
+        if (playerColor == EPointColor.BLACK) {
+            output += colorBlack + "BLACK" + colorDefault;
+        } else if (playerColor == EPointColor.WHITE) {
+            output += colorWhite + "WHITE" + colorDefault;
+        }
+        output += "\n";
+
+        output += "Currently, it's ";
+        if (currentPlayerColor == EPointColor.BLACK) {
+            output += colorBlack + "BLACK" + colorDefault + "'s turn";
+        } else if (currentPlayerColor == EPointColor.WHITE) {
+            output += colorWhite + "WHITE" + colorDefault + "'s turn";
+        }
+        output += "\n";
 
         // Print errors
         String errorMessage = errorMessages[playerId];
         if (!errorMessage.equals("")) {
-            output += "\n\u001b[31m" + errorMessage + "\u001B[0m\n";
+            output += colorRed + errorMessage + colorDefault + "\n";
             errorMessages[playerId] = "";
         }
 
@@ -60,9 +82,9 @@ public class Board implements IBoard {
                 if (stones[j][i].getColor() == EPointColor.NONE) {
                     output += " + ";
                 } else if (stones[j][i].getColor() == EPointColor.BLACK) {
-                    output += "\u001B[34m ● \u001B[0m";
+                    output += colorBlack + " ● " + colorDefault;
                 } else if (stones[j][i].getColor() == EPointColor.WHITE) {
-                    output += "\u001B[33m ● \u001B[0m";
+                    output += colorWhite + " ● " + colorDefault;
                 } else if (stones[j][i].getColor() == EPointColor.BORDER) {
                     output += " X ";
                 }

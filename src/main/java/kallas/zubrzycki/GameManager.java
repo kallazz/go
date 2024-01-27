@@ -11,16 +11,16 @@ public class GameManager implements IGameManager {
     private static int BOARD_SIZE = 6;
 
     private Board board;
-    private SQLLiteJDBC db;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
-    private int game_id;
-    private int current_turn;
-
     private boolean isPassedPlayer1 = false;
     private boolean isPassedPlayer2 = false;
     private boolean didBothPlayersPass = false;
+
+    private SQLLiteJDBC db;
+    private int game_id;
+    private int current_turn;
 
     private List<IGameManagerObserver> observers = new ArrayList<IGameManagerObserver>();
 
@@ -39,16 +39,11 @@ public class GameManager implements IGameManager {
 
     @Override
     public void initializeGame(int player1Id, int player2Id) {
-        try {
-            db = new SQLLiteJDBC("jdbc:sqlite:database.db");
-            game_id = obtainGameId(db);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
+        current_turn = 0;
 
         board = Board.getInstance();
         board.initialize(BOARD_SIZE);
-        current_turn = 0;
         player1 = new Player(EPointColor.BLACK, player1Id);
         player2 = new Player(EPointColor.WHITE, player2Id);
         currentPlayer = player1;
@@ -74,12 +69,7 @@ public class GameManager implements IGameManager {
             final int y = Integer.parseInt(input.split(" ")[2]);
 
             if (board.checkMove(x, y, currentPlayer.getColor(), currentPlayer.getId())) {
-                try {
-                    db.insertNewMove(game_id, current_turn, input);
-                    current_turn++;
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+
 
                 board.performMove(x, y, currentPlayer.getColor());
 
@@ -93,12 +83,7 @@ public class GameManager implements IGameManager {
                 board.addErrorMessage("Wrong move - you lose your turn", playerId);
             }
         } else {
-            try {
-                db.insertNewMove(game_id, current_turn, input);
-                current_turn++;
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+
 
             if (currentPlayer == player1) {
                 isPassedPlayer1 = true;
@@ -155,7 +140,8 @@ public class GameManager implements IGameManager {
     }
 
     public String getBoard(int playerId) {
-        return board.getBoardView(playerId);
+        EPointColor playerColor = (player1.getId() == playerId) ? player1.getColor() : player2.getColor();
+        return board.getBoardView(playerId, playerColor, currentPlayer.getColor());
     }
 
     // *************************************** Observers ***************************************

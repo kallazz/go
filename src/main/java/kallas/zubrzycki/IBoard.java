@@ -7,5 +7,5 @@ public interface IBoard {
     public Stone[][] getBoardPoints();
     public void initialize(int size);
     public void performMove(int x, int y, EPointColor state);
-    public String getBoardView(int playerId);
+    public String getBoardView(int playerId, EPointColor playerColor, EPointColor currentPlayerColor);
 }
