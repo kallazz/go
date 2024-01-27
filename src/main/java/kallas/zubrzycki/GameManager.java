@@ -97,6 +97,11 @@ public class GameManager implements IGameManager {
             }
         } else {
 
+            try {
+                db.insertNewMove(game_id, current_turn, input);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
             if (currentPlayer == player1) {
                 isPassedPlayer1 = true;
