@@ -40,14 +40,29 @@ public class Server {
         System.out.println("2 players connected. The game is starting");
         isGameStarted = true;
 
+        ClientHandler firstClientHandler = clientHandlers.get(0);
+        ClientHandler secondClientHandler = clientHandlers.get(1);
         int firstPlayerId = clientHandlers.get(0).getPlayerId();
         int secondPlayerId = clientHandlers.get(1).getPlayerId();
-        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers.get(0), firstPlayerId));
-        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers.get(1), secondPlayerId));
+        gameManager.attachObserver(new GameManagerObserver(gameManager, firstClientHandler, firstPlayerId));
+        gameManager.attachObserver(new GameManagerObserver(gameManager, secondClientHandler, secondPlayerId));
         gameManager.initializeGame(firstPlayerId, secondPlayerId);
-        while (true) {
-            // TODO: Finish
+        firstClientHandler.sendMessage(gameManager.getBoard(firstPlayerId));
+        secondClientHandler.sendMessage(gameManager.getBoard(secondPlayerId));
+
+        while (!gameManager.isGameFinished()) {
+            try {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
+
+        firstClientHandler.sendMessage("The game is over");
+        secondClientHandler.sendMessage("The game is over");
+        System.out.println("The game is finished");
+        stop();
     }
 
     public void stop() {
@@ -77,14 +92,16 @@ public class Server {
             return this.id;
         }
 
-        public void printBoard(String board) {
-            userOutput.println(board + "\u0004");
+        public void sendMessage(String message) {
+            userOutput.println(message + "\u0004");
         }
 
         public void run() {
             try {
                 userInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 userOutput = new PrintWriter(clientSocket.getOutputStream(), true);
+
+                sendMessage("Welcome to the server!");
 
                 String inputLine;
                 while ((inputLine = userInput.readLine()) != null) {
@@ -103,7 +120,7 @@ public class Server {
     }
 
 
-    private class GameManagerObserver implements IObserver {
+    private class GameManagerObserver extends IGameManagerObserver {
         private GameManager gameManager;
         private ClientHandler clientHandler;
 
@@ -114,7 +131,8 @@ public class Server {
 
         @Override
         public void update() {
-            clientHandler.printBoard(gameManager.getBoard(clientHandler.getPlayerId()));
+            String board = gameManager.getBoard(clientHandler.getPlayerId());
+            clientHandler.sendMessage(board);
         }
     }
 }

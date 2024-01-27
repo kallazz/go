@@ -21,8 +21,9 @@ public class GameManager implements IGameManager {
 
     private boolean isPassedPlayer1 = false;
     private boolean isPassedPlayer2 = false;
+    private boolean didBothPlayersPass = false;
 
-    private List<IObserver> observers = new ArrayList<IObserver>();
+    private List<IGameManagerObserver> observers = new ArrayList<IGameManagerObserver>();
 
     int obtainGameId(SQLLiteJDBC db) throws SQLException {
 
@@ -39,7 +40,6 @@ public class GameManager implements IGameManager {
 
     @Override
     public void initializeGame(int player1Id, int player2Id) {
-
         try {
             db = new SQLLiteJDBC("jdbc:sqlite:database.db");
             game_id = obtainGameId(db);
@@ -82,6 +82,7 @@ public class GameManager implements IGameManager {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
+
                 board.performMove(x, y, currentPlayer.getColor());
 
                 // Reset this player's pass status
@@ -94,7 +95,6 @@ public class GameManager implements IGameManager {
                 board.addErrorMessage("Wrong move - you lose your turn", playerId);
             }
         } else {
-
             try {
                 db.insertNewMove(game_id, current_turn, input);
                 current_turn++;
@@ -112,16 +112,12 @@ public class GameManager implements IGameManager {
         if (isPassedPlayer1 && isPassedPlayer2) {
             countScore();
             notifyObservers();
-            return; // TODO: handle properly
+            didBothPlayersPass = true;
+            return;
         }
 
         currentPlayer = (player1 == currentPlayer) ? player2 : player1;
         notifyObservers();
-    }
-
-    @Override
-    public void countScore() {
-
     }
 
     private boolean parseInput(String input, int playerId) {
@@ -151,18 +147,27 @@ public class GameManager implements IGameManager {
         return false;
     }
 
+    @Override
+    public void countScore() {
+
+    }
+
+    public boolean isGameFinished() {
+        return didBothPlayersPass;
+    }
+
     public String getBoard(int playerId) {
         return board.getBoardView(playerId);
     }
 
     // *************************************** Observers ***************************************
 
-    public void attachObserver(IObserver observer) {
+    public void attachObserver(IGameManagerObserver observer) {
         observers.add(observer);
     }
 
     public void notifyObservers() {
-        for (IObserver observer : observers) {
+        for (IGameManagerObserver observer : observers) {
             observer.update();
         }
     }
