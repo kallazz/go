@@ -11,7 +11,6 @@ public class GameManager implements IGameManager {
     private static int BOARD_SIZE = 6;
 
     private Board board;
-    private GameHistory gameHistory;
     private SQLLiteJDBC db;
     private Player player1;
     private Player player2;
@@ -50,7 +49,6 @@ public class GameManager implements IGameManager {
         board = Board.getInstance();
         board.initialize(BOARD_SIZE);
         current_turn = 0;
-        gameHistory = GameHistory.getInstance();
         player1 = new Player(EPointColor.BLACK, player1Id);
         player2 = new Player(EPointColor.WHITE, player2Id);
         currentPlayer = player1;

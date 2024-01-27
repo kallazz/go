@@ -43,31 +43,6 @@ public class Board implements IBoard {
         }
     }
 
-    public void printBoard() {
-        /* 
-        // Print errors
-        if (!errorMessage.equals("")) {
-            System.out.println("\u001b[31m" + errorMessage + "\u001B[0m");
-            errorMessage = "";
-        }
-
-        for (int i = 0; i <= size + 1; i++) {
-            for (int j = 0; j <= size + 1; j++) {
-                if (stones[j][i].getColor() == EPointColor.NONE) {
-                    System.out.print(" + ");
-                } else if (stones[j][i].getColor() == EPointColor.BLACK) {
-                    System.out.print("\u001B[34m ● \u001B[0m");
-                } else if (stones[j][i].getColor() == EPointColor.WHITE) {
-                    System.out.print("\u001B[33m ● \u001B[0m");
-                } else if (stones[j][i].getColor() == EPointColor.BORDER) {
-                    System.out.print(" X ");
-                }
-            }
-            System.out.print('\n');
-        }
-        */
-    }
-
     public String getBoardView(int playerId) {
         // Clear the console
         String output = "\033[H\033[2J";
