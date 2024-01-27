@@ -14,6 +14,7 @@ public class ServerTest {
     @Test
     @Ignore
     public void shouldNotStartGameForOnePlayer() {
+        /*
         Client client = new Client();
         client.startConnection(IP_ADDRESS, PORT);
         String output = client.sendMessage("some message");
@@ -21,6 +22,7 @@ public class ServerTest {
         client.stopConnection();
 
         assertEquals("The game hasn't started yet!", output);
+        */
     }
 
     @Test

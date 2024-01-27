@@ -4,6 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameManager implements IGameManager {
     private static int BOARD_SIZE = 6;
 
@@ -19,6 +22,7 @@ public class GameManager implements IGameManager {
     private boolean isPassedPlayer1 = false;
     private boolean isPassedPlayer2 = false;
 
+    private List<IObserver> observers = new ArrayList<IObserver>();
 
     int obtainGameId(SQLLiteJDBC db) throws SQLException {
 
@@ -52,16 +56,18 @@ public class GameManager implements IGameManager {
         currentPlayer = player1;
     }
     @Override
-    public synchronized String makeMove(String input, int playerId) {
+    public synchronized void makeMove(String input, int playerId) {
         // Quit if it's not this player's turn
         if (playerId != currentPlayer.getId()) {
-            board.addErrorMessage("This is not your turn!");
-            return board.getBoardView();
+            board.addErrorMessage("This is not your turn!", playerId);
+            notifyObservers();
+            return;
         }
 
         // Quit if input is incorrect
-        if (!parseInput(input)) {
-            return board.getBoardView();
+        if (!parseInput(input, playerId)) {
+            notifyObservers();
+            return;
         }
 
         // Handle correct input
@@ -69,8 +75,7 @@ public class GameManager implements IGameManager {
             final int x = Integer.parseInt(input.split(" ")[1]);
             final int y = Integer.parseInt(input.split(" ")[2]);
 
-            if (board.checkMove(x, y, currentPlayer.getColor())) {
-
+            if (board.checkMove(x, y, currentPlayer.getColor(), currentPlayer.getId())) {
                 try {
                     db.insertNewMove(game_id, current_turn, input);
                     current_turn++;
@@ -86,7 +91,7 @@ public class GameManager implements IGameManager {
                     isPassedPlayer2 = false;
                 }
             } else {
-                board.addErrorMessage("Wrong move - you lose your turn");
+                board.addErrorMessage("Wrong move - you lose your turn", playerId);
             }
         } else {
 
@@ -106,20 +111,20 @@ public class GameManager implements IGameManager {
 
         if (isPassedPlayer1 && isPassedPlayer2) {
             countScore();
-            return "THE GAME IS FINISHED";
+            notifyObservers();
+            return; // TODO: handle properly
         }
 
         currentPlayer = (player1 == currentPlayer) ? player2 : player1;
-
-        return board.getBoardView();
+        notifyObservers();
     }
 
     @Override
     public void countScore() {
-            
+
     }
 
-    private boolean parseInput(String input) {
+    private boolean parseInput(String input, int playerId) {
         if (input.equals("pass")) {
             return true;
         } else {
@@ -131,18 +136,34 @@ public class GameManager implements IGameManager {
                     final int y = Integer.parseInt(words[2]);
 
                     if (x < 0 || x > BOARD_SIZE || y < 0 || y > BOARD_SIZE) {
-                        board.addErrorMessage("x and y should be in <1, " + BOARD_SIZE + ">");
+                        board.addErrorMessage("x and y should be in <1, " + BOARD_SIZE + ">", playerId);
                         return false;
                     } else {
                         return true;
                     }
                 } catch (Exception ex) {
-                    board.addErrorMessage("Correct format: go <x> <y>");
+                    board.addErrorMessage("Correct format: go <x> <y>", playerId);
                     return false;
                 }
             }
         }
-        board.addErrorMessage("Allowed actions are: 'go <x> <y>' or 'pass'");
+        board.addErrorMessage("Allowed actions are: 'go <x> <y>' or 'pass'", playerId);
         return false;
+    }
+
+    public String getBoard(int playerId) {
+        return board.getBoardView(playerId);
+    }
+
+    // *************************************** Observers ***************************************
+
+    public void attachObserver(IObserver observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObservers() {
+        for (IObserver observer : observers) {
+            observer.update();
+        }
     }
 }

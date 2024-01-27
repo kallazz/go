@@ -9,7 +9,7 @@ public class Board implements IBoard {
     private static volatile Board instance = null;
     private Stone[][] stones;
     private int size;
-    private String errorMessage = "";
+    private String[] errorMessages = {"", ""}; // error messages for player1 and player2
 
     private Board() {}
 
@@ -44,6 +44,7 @@ public class Board implements IBoard {
     }
 
     public void printBoard() {
+        /* 
         // Print errors
         if (!errorMessage.equals("")) {
             System.out.println("\u001b[31m" + errorMessage + "\u001B[0m");
@@ -64,17 +65,19 @@ public class Board implements IBoard {
             }
             System.out.print('\n');
         }
+        */
     }
 
-    public String getBoardView() {
+    public String getBoardView(int playerId) {
         // Clear the console
         String output = "\033[H\033[2J";
         //System.out.flush();
 
         // Print errors
+        String errorMessage = errorMessages[playerId];
         if (!errorMessage.equals("")) {
             output += "\n\u001b[31m" + errorMessage + "\u001B[0m\n";
-            errorMessage = "";
+            errorMessages[playerId] = "";
         }
 
         for (int i = 0; i <= size + 1; i++) {
@@ -102,28 +105,28 @@ public class Board implements IBoard {
     }
 
     @Override
-    public boolean checkMove(int x, int y, EPointColor playerColor) {
+    public boolean checkMove(int x, int y, EPointColor playerColor, int playerId) {
         //Check if x and y are within boundaries
         if(!(x <= size && y <= size && x >= 1 && y >= 1)){
-            addErrorMessage("x or y out of bounds");
+            addErrorMessage("x or y out of bounds", playerId);
             return false;
         }
         // Check if the spot is empty
         if(stones[x][y].getColor() != EPointColor.NONE){
-            addErrorMessage("That point was taken by " + stones[x][y].getColor());
+            addErrorMessage("That point was taken by " + stones[x][y].getColor(), playerId);
             return false;
         }
         Stone newStone = new Stone(x, y, playerColor);
         //Check if after placing the stone, there is at least one liberty - Unless there is a capture happening "Suicide rule"
         if(simulateNewStoneAndCountLiberties(newStone) == 0){
             if(simulateNewStoneAndCheckForCaptures(newStone) == false){
-                addErrorMessage("There must be at least one liberty, unless you capture");
+                addErrorMessage("There must be at least one liberty, unless you capture", playerId);
                 return false;
             }
         }
         //Check for KO rule
         if(simulateNewStoneAndCheckForKORuleViolation() == 0){
-            addErrorMessage("KO rule would be violated");
+            addErrorMessage("KO rule would be violated", playerId);
             return false;
         }
         return true;
@@ -264,8 +267,8 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void addErrorMessage(String errorMessage) {
-        this.errorMessage += errorMessage;
+    public void addErrorMessage(String errorMessage, int playerId) {
+        this.errorMessages[playerId] = errorMessage;
     }
 
     public Stone[][] getStones(){

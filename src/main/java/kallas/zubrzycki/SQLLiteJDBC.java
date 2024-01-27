@@ -3,11 +3,11 @@ package kallas.zubrzycki;
 import java.sql.*;
 
 public class SQLLiteJDBC {
+    private Connection connection = null;
+
     public Connection getConnection() {
         return connection;
     }
-
-    Connection connection = null;
 
     public void initialize() throws SQLException {
         String url = "jdbc:sqlite:database.db";
