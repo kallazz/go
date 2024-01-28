@@ -13,8 +13,8 @@ public class ClientApp {
         System.out.println("1. Join Game\n2. View Past Games\n3. Join as a bot\n4. Exit");
 
         String input = scanner.nextLine();
-        while (!input.equals("1") && !input.equals("2") && !input.equals("3")) {
-            System.out.println("Incorrect input. The only allowed options are 1, 2, 3.");
+        while (!input.equals("1") && !input.equals("2") && !input.equals("3") && !input.equals("4")) {
+            System.out.println("Incorrect input. The only allowed options are 1, 2, 3, 4.");
             input = scanner.nextLine();
         }
         Client client = new Client();
