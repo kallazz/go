@@ -42,7 +42,7 @@ public class ClientApp {
                 }
                 System.out.println("Which game would you like to replay?");
                 int replayGameId = scanner.nextInt();
-                client.replayGame(replayGameId);
+                replayGame(replayGameId);
 
             }
             catch (SQLException ex) {
@@ -53,5 +53,32 @@ public class ClientApp {
             scanner.close();
             System.exit(0);
         }
+    }
+
+    public static void replayGame(int gameId) throws SQLException {
+        SQLLiteJDBC db = new SQLLiteJDBC("jdbc:sqlite:database.db");
+        int i = 1;
+        Statement statement = db.getConnection().createStatement();
+
+        while (true) {
+            String query = "SELECT move_text FROM moves WHERE game_id=" + gameId + " AND move_number=" + i;
+            ResultSet rs = statement.executeQuery(query);
+
+            if (!rs.next()) {  // No more moves found
+                break;
+            }
+            if(i%2 == 1){
+                System.out.println(i + ". BLACK: " + rs.getString("move_text"));
+            } else {
+                System.out.println(i + ". WHITE: " + rs.getString("move_text"));
+            }
+
+            // Replay the move using moveText
+
+
+            i++;
+        }
+
+        statement.close();
     }
 }
