@@ -100,6 +100,11 @@ public class Server {
             this.id = id;
         }
 
+        public ClientHandler(Socket socket) {
+            this.clientSocket = socket;
+            this.id = 999; // BOT
+        }
+
         public int getPlayerId() {
             return this.id;
         }

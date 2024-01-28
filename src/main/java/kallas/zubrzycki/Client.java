@@ -8,7 +8,10 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Random;
 import java.util.Scanner;
+
+import static java.lang.Thread.sleep;
 
 public class Client {
     private Socket clientSocket;
@@ -72,4 +75,26 @@ public class Client {
         }
     }
 
+
+    public void addBot(){
+        if (!isConnected) {
+            return;
+        }
+
+        while(true){
+            try {
+                sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            Random moveGenerator = new Random();
+            if (moveGenerator.nextDouble() < 0.08) { // 8% chance to pass
+                out.println("pass");
+            } else {
+                int x = moveGenerator.nextInt(19) + 1;
+                int y = moveGenerator.nextInt(19) + 1;
+                out.println("go " + x + " " + y);
+            }
+        }
+    }
 }

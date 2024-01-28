@@ -10,7 +10,7 @@ public class ClientApp {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("1. Join Game\n2. View Past Games\n3. Exit");
+        System.out.println("1. Join Game\n2. View Past Games\n3. Join as a bot\n4. Exit");
 
         String input = scanner.nextLine();
         while (!input.equals("1") && !input.equals("2") && !input.equals("3")) {
@@ -49,7 +49,10 @@ public class ClientApp {
                 System.out.println("Something went wrong with the database");
                 ex.printStackTrace();
             }
-        } else {
+        } else if(input.equals("3")){
+            client.startConnection("127.0.0.1", 6666);
+            client.addBot();
+        } else if(input.equals("4")){
             scanner.close();
             System.exit(0);
         }

@@ -194,21 +194,17 @@ public class Board implements IBoard {
     public int simulateNewStoneAndCheckForKORuleViolation(Stone newStone) throws SQLException {
         SQLLiteJDBC db = gm.getDatabase();
         String query = "SELECT move_text FROM moves WHERE game_id="+gm.getGame_id() + " AND move_number=" + (gm.getCurrent_turn() - 1);
-        System.out.println(query);
         Statement statement = db.getConnection().createStatement();
 
         try {
             ResultSet rs = statement.executeQuery(query);
             if (rs.next()) {
                 String previousMove = rs.getString("move_text");
-                System.out.println(previousMove);
                 if (previousMove.equals("pass")) {
                     return 1;
                 }
                 int previousMoveX = Integer.parseInt(previousMove.split(" ")[1]);
-                System.out.println(previousMoveX);
                 int previousMoveY = Integer.parseInt(previousMove.split(" ")[2]);
-                System.out.println(previousMoveY);
 
                 if (newStone.getX() == previousMoveX && newStone.getY() == previousMoveY) {
                     return 0;

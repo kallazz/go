@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager implements IGameManager {
-    private static int BOARD_SIZE = 5;
+    private static int BOARD_SIZE = 19;
 
     private Board board;
     private Player player1;
@@ -64,6 +64,9 @@ public class GameManager implements IGameManager {
     @Override
     public synchronized void makeMove(String input, int playerId) {
         // Quit if it's not this player's turn
+        if(currentPlayer == null){
+            return;
+        }
         if (playerId != currentPlayer.getId()) {
             board.addErrorMessage("This is not your turn!", playerId);
             notifyObservers();
@@ -78,6 +81,7 @@ public class GameManager implements IGameManager {
 
         // Handle correct input
         if (!input.equals("pass")) {
+            System.out.println(currentPlayer.getColor().toString() + ": " + input);
             final int x = Integer.parseInt(input.split(" ")[1]);
             final int y = Integer.parseInt(input.split(" ")[2]);
 
@@ -105,6 +109,7 @@ public class GameManager implements IGameManager {
         } else {
 
             try {
+                System.out.println(currentPlayer.getColor().toString() + ": " + input);
                 current_turn++;
                 db.insertNewMove(game_id, current_turn, input);
             } catch (SQLException e) {
