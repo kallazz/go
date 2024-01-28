@@ -182,7 +182,7 @@ public class Server {
                 String inputLine;
                 while ((inputLine = userInput.readLine()) != null) {
                     if (!isGameActive) {
-                        userOutput.println("The game hasn't started yet!\u0004");
+                        sendMessage("The game hasn't started yet!");
                     } else {
                         gameManager.makeMove(inputLine, id);
                     }
