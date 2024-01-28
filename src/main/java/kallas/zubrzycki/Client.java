@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class Client {
@@ -68,4 +71,32 @@ public class Client {
             out.println(input);
         }
     }
+
+    public void replayGame(int gameId) throws SQLException {
+        SQLLiteJDBC db = new SQLLiteJDBC("jdbc:sqlite:database.db");
+        int i = 1;
+        Statement statement = db.getConnection().createStatement();
+
+        while (true) {
+            String query = "SELECT move_text FROM moves WHERE game_id=" + gameId + " AND move_number=" + i;
+            ResultSet rs = statement.executeQuery(query);
+
+            if (!rs.next()) {  // No more moves found
+                break;
+            }
+            if(i%2 == 1){
+                System.out.println(i + ". BLACK: " + rs.getString("move_text"));
+            } else {
+                System.out.println(i + ". WHITE: " + rs.getString("move_text"));
+            }
+
+            // Replay the move using moveText
+
+
+            i++;
+        }
+
+        statement.close();
+    }
+
 }

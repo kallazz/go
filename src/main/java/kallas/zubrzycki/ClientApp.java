@@ -17,31 +17,23 @@ public class ClientApp {
             System.out.println("Incorrect input. The only allowed options are 1, 2, 3.");
             input = scanner.nextLine();
         }
-
+        Client client = new Client();
         if (input.equals("1")) {
-            Client client = new Client();
+
             client.startConnection("127.0.0.1", 6666);
             client.loop();
         } else if (input.equals("2")) {
-            System.out.println("dupa -1");
             System.out.println("Here are all previous games:");
-            System.out.println("dupa 0");
             try {
-                System.out.println("dupa 1");
                 SQLLiteJDBC db = new SQLLiteJDBC("jdbc:sqlite:database.db");
-                System.out.println("dupa 2");
                 String query = "SELECT COUNT(*) FROM games";
                 String query2 = "SELECT * FROM games";
-                System.out.println("dupa 3");
                 Statement statement = db.getConnection().createStatement();
-                System.out.println("dupa 4");
                 ResultSet rs = statement.executeQuery(query);
                 int rowCount = rs.getInt(1);
-                System.out.println(rowCount + "rowCount");
                 rs.close();
 
                 ResultSet rs2 = statement.executeQuery(query2);
-                System.out.println("dupa 5");
 
                 int i = 1;
                 while(rs2.next()){
@@ -49,7 +41,9 @@ public class ClientApp {
                     i++;
                 }
                 System.out.println("Which game would you like to replay?");
-                //TAKE INPUT AND REPLAY
+                int replayGameId = scanner.nextInt();
+                client.replayGame(replayGameId);
+
             }
             catch (SQLException ex) {
                 System.out.println("Something went wrong with the database");
