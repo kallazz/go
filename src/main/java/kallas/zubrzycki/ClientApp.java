@@ -8,6 +8,8 @@ import java.util.Scanner;
 import static java.lang.Thread.sleep;
 
 public class ClientApp {
+    private static final String IP_ADRESS = "127.0.0.1";
+    private static final int PORT = 6666;
 
     private final Client client = new Client();
     private final Scanner scanner = new Scanner(System.in);
@@ -40,7 +42,7 @@ public class ClientApp {
     }
 
     private void joinGame() {
-        client.startConnection("127.0.0.1", 6666);
+        client.startConnection(IP_ADRESS, PORT);
         client.loop();
     }
 
@@ -52,28 +54,26 @@ public class ClientApp {
             String query2 = "SELECT * FROM games";
             Statement statement = db.getConnection().createStatement();
             ResultSet rs = statement.executeQuery(query);
-            int rowCount = rs.getInt(1);
             rs.close();
 
             ResultSet rs2 = statement.executeQuery(query2);
 
             int i = 1;
-            while(rs2.next()){
+            while(rs2.next()) {
                 System.out.println(i + " - ID: " + rs2.getString("game_id") + " Winner: " + rs2.getString("winner") + " Date: " + rs2.getDate("date"));
                 i++;
             }
             System.out.println("Which game would you like to replay?");
             int replayGameId = scanner.nextInt();
             replayGame(replayGameId);
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             System.out.println("Something went wrong with the database");
             ex.printStackTrace();
         }
     }
 
     private void joinAsBot() {
-        client.startConnection("127.0.0.1", 6666);
+        client.startConnection(IP_ADRESS, PORT);
         client.addBot();
     }
 
@@ -82,7 +82,7 @@ public class ClientApp {
         System.exit(0);
     }
 
-    public void replayGame(int gameId) throws SQLException {
+    public void replayGame(final int gameId) throws SQLException {
 
         SQLLiteJDBC db = new SQLLiteJDBC("jdbc:sqlite:database.db");
         int i = 1;
@@ -91,7 +91,7 @@ public class ClientApp {
         // Replay the move using moveText
         Board board = Board.getInstance();
         GameManager gameManager = new GameManager();
-        board.initialize(19, gameManager);
+        board.initialize(GameManager.BOARD_SIZE, gameManager);
         gameManager.initializeGame(0, 1);
         while (true) {
             String query = "SELECT move_text FROM moves WHERE game_id=" + gameId + " AND move_number=" + i;
@@ -101,9 +101,6 @@ public class ClientApp {
                 break;
             }
             String move_text = rs.getString("move_text");
-
-
-
 
             String input_words[] = move_text.split(" ");
             if(input_words.length == 3){

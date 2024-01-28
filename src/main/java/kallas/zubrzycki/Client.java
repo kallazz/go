@@ -5,9 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -21,7 +18,7 @@ public class Client {
     private Thread receiveThread;
     private boolean isConnected = false;
 
-    public void startConnection(String ip, int port) {
+    public void startConnection(final String ip, final int port) {
         try {
             clientSocket = new Socket(ip, port);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -78,12 +75,12 @@ public class Client {
     }
 
 
-    public void addBot(){
+    public void addBot() {
         if (!isConnected) {
             return;
         }
 
-        while(true){
+        while(true) {
             try {
                 sleep(200);
             } catch (InterruptedException e) {
@@ -93,8 +90,8 @@ public class Client {
             if (moveGenerator.nextDouble() < 0.05) { // 8% chance to pass
                 out.println("pass");
             } else {
-                int x = moveGenerator.nextInt(19) + 1;
-                int y = moveGenerator.nextInt(19) + 1;
+                int x = moveGenerator.nextInt(GameManager.BOARD_SIZE) + 1;
+                int y = moveGenerator.nextInt(GameManager.BOARD_SIZE) + 1;
                 out.println("go " + x + " " + y);
             }
         }

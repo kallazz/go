@@ -49,10 +49,10 @@ public class BoardTest {
         board.initialize(BOARD_SIZE, new GameManager());
         Stone[][] boardPoints;
 
-        //board.performMove(2, 3, EPointColor.BLACK);
+        board.performMove(2, 3, EPointColor.BLACK);
         boardPoints = board.getBoardPoints();
         assertEquals(EPointColor.BLACK, boardPoints[2][3].getColor());
-        //board.performMove(2, 3, EPointColor.WHITE);
+        board.performMove(2, 3, EPointColor.WHITE);
         boardPoints = board.getBoardPoints();
         assertEquals(EPointColor.WHITE, boardPoints[2][3].getColor());
     }

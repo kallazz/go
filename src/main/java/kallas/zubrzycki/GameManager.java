@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager implements IGameManager {
-    private static int BOARD_SIZE = 19;
+    public static int BOARD_SIZE = 19;
 
     private Board board;
     private Player player1;
-    private int player1score;
     private Player player2;
-    private int player2score;
     private Player currentPlayer;
     private String winner = "NOONE";
     private boolean isPassedPlayer1 = false;
