@@ -36,6 +36,7 @@ public class Client {
         }
     }
 
+
     private void stopConnection() {
         try {
             in.close();

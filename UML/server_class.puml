@@ -1,0 +1,100 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class App
+@startuml
+class App {
++main()
+}
+class Server {
++ start()
+
+}
+
+class GameManager {
+- game_id : Integer
+- board : Board
+- player1 : Player
+- player2 : Player
+- winner : String
+- db : SQLLiteJDBC
++ initializeGame()
++ parseInput()
++makeMove()
++ addGameToDatabase()
++ notifyObservers()
+
+}
+
+class SQLLiteJDBC {
++ main()
++initialize()
++insertNewMove()
++insertNewGame()
+- url : String
+}
+
+class Board {
+ - stones : Stone[][]
+ + getInstance() : Board
+ + initialize(size, gameManager)
+ + getBoardView() : String
+ + performMove()
+ + checkmove() : bool
+ + addErrorMessage()
+ + countPlayerScore() : Integer
+}
+
+class Player {
+- score : Integer
+- color : EPointColor
+
+}
+
+enum EPointColor {
+BLACK
+WHITE
+NONE
+BORDER
+}
+interface IGameManagerObserver {
+# gameManager : GameManager
++update()
+}
+
+class Stone {
+- chain : ChainOfStones
+- color : EPointColor
+- x : Integer
+- y : Integer
++ countLiberties() : Integer
++ doesExist() : bool
+}
+
+class ChainOfStones {
+ - stones : ArrayList<Stone>
+ + countLiberties() : Integer
+ + addStone(stone)
+}
+
+App -> Server
+Server -> GameManager
+
+GameManager --> SQLLiteJDBC
+
+GameManager -> Board
+
+IGameManagerObserver --> GameManager
+
+Board <- ChainOfStones
+
+ChainOfStones <-- Stone
+
+Stone -> Board
+
+Player -> EPointColor
+
+Stone -> EPointColor
+
+Player --> GameManager
+@enduml

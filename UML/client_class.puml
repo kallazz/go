@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Client {
++startConnection()
++loop()
++addBot()
+}
+
+class ClientApp {
++run()
+}
+
+ClientApp -> Client
+
+@enduml
