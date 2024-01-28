@@ -303,13 +303,17 @@ public class Board implements IBoard {
                     FloodFillResult result = floodFill(stone, surroundingColors, 0);
                     System.out.println("Result count: " + result.count);
                     System.out.println("Result surroundingColors: " + result.surroundingColors);
+                    System.out.println("Player color: " + playerColor);
+                    System.out.println("SurroundingColors size: " + result.surroundingColors.size());
+                    System.out.println("Does it contain player color? " + (result.surroundingColors.contains(playerColor) ? "yes" : "no"));
                     if(result.surroundingColors.size() == 1 && result.surroundingColors.contains(playerColor)){
+                        System.out.println("Adding score! +=" + result.count);
                         score += result.count;
                     }
                 }
             }
         }
-
+        System.out.println("Final score: " + score);
         return score;
     }
     private FloodFillResult floodFill(Stone stone, HashSet<EPointColor> surroundingColors, int currentCount){

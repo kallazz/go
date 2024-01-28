@@ -171,11 +171,11 @@ public class GameManager implements IGameManager {
 
     @Override
     public void countScore() {
-        player1score = board.countPlayerScore(player1);
-        player2score = board.countPlayerScore(player2);
-        if(player1score > player2score){
+        player1.setScore(board.countPlayerScore(player1));
+        player2.setScore(board.countPlayerScore(player2));
+        if(player1.getScore() > player2.getScore()){
             winner = player1.getColor().toString();
-        } else if(player1score < player2score){
+        } else if(player1.getScore() < player2.getScore()){
             winner = player2.getColor().toString();
         } else {
             winner = "DRAW!";
