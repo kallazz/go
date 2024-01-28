@@ -3,7 +3,7 @@ package kallas.zubrzycki;
 import java.util.ArrayList;
 
 public class ChainOfStones implements IChainOfStones {
-    ArrayList<Stone> stones = new ArrayList<Stone>();
+    private ArrayList<Stone> stones = new ArrayList<Stone>();
 
     public int countLiberties(Stone[][] allStones){
         int liberties = 0;
@@ -20,9 +20,14 @@ public class ChainOfStones implements IChainOfStones {
         }
     }
 
-    public int size(){
+    public ArrayList<Stone> getStones() {
+        return stones;
+    }
+
+    public int getSize() {
         return stones.size();
     }
+
     @Override
     public void addStone(Stone stone) {
         stones.add(stone);

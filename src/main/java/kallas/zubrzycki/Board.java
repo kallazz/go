@@ -206,7 +206,7 @@ public class Board implements IBoard {
                 if(stone.getChain() != null && stone.getColor() != color){
                     if(stone.getChain().countLiberties(allStones) == 0){
                         anyCaptures = true;
-                        for(Stone capturedStone : stone.getChain().stones) {
+                        for(Stone capturedStone : stone.getChain().getStones()) {
                             player.setScore(player.getScore() + 1);
                             stones[capturedStone.getX()][capturedStone.getY()].setColor(EPointColor.NONE);
                             stones[capturedStone.getX()][capturedStone.getY()].setChain(null);
