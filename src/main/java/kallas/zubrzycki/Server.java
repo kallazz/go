@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
@@ -19,7 +20,8 @@ public class Server {
 
     public void start(int port) {
         try {
-            serverSocket = new ServerSocket(port);
+            String ipAddress = "127.0.0.1";
+            serverSocket = new ServerSocket(port, 0, InetAddress.getByName(ipAddress));
             System.out.println("Server started on port " + port);
             waitForPlayers(port);
         } catch (IOException e) {
@@ -184,7 +186,7 @@ public class Server {
                     if (!isGameActive) {
                         userOutput.println("The game hasn't started yet!\u0004");
                     } else {
-                        gameManager.makeMove(inputLine, id);
+                        gameManager.makeMove(inputLine, id, true);
                     }
                 }
                 System.out.println("Client disconnected from the server");

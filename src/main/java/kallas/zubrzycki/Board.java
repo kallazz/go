@@ -52,47 +52,70 @@ public class Board implements IBoard {
     @Override
     public String getBoardView(int playerId, EPointColor playerColor, EPointColor currentPlayerColor) {
         // Clear the console
-        String output = "\033[H\033[2J";
+        StringBuilder output = new StringBuilder("\033[H\033[2J");
  
         // Print info about this player's color and whose turn it is
-        output += "You are playing as ";
+        output.append("You are playing as ");
         if (playerColor == EPointColor.BLACK) {
-            output += colorBlack + "BLACK" + colorDefault;
+            output.append(colorBlack).append("BLACK").append(colorDefault);
         } else if (playerColor == EPointColor.WHITE) {
-            output += colorWhite + "WHITE" + colorDefault;
+            output.append(colorWhite).append("WHITE").append(colorDefault);
+        } else if (playerColor == EPointColor.NONE) {
+            output.append("NO ONE! You are replaying a game.");
         }
-        output += "\n";
+        output.append("\n");
 
-        output += "Currently, it's ";
+        output.append("Currently, it's ");
         if (currentPlayerColor == EPointColor.BLACK) {
-            output += colorBlack + "BLACK" + colorDefault + "'s turn";
+            output.append(colorBlack).append("BLACK").append(colorDefault).append("'s turn");
         } else if (currentPlayerColor == EPointColor.WHITE) {
-            output += colorWhite + "WHITE" + colorDefault + "'s turn";
+            output.append(colorWhite).append("WHITE").append(colorDefault).append("'s turn");
         }
-        output += "\n";
+        output.append("\n");
 
         // Print errors
         String errorMessage = errorMessages[playerId];
         if (!errorMessage.equals("")) {
-            output += colorRed + errorMessage + colorDefault + "\n";
+            output.append(colorRed).append(errorMessage).append(colorDefault).append("\n");
             errorMessages[playerId] = "";
         }
 
         for (int i = 0; i <= size + 1; i++) {
             for (int j = 0; j <= size + 1; j++) {
                 if (stones[j][i].getColor() == EPointColor.NONE) {
-                    output += " + ";
+                    output.append(" + ");
                 } else if (stones[j][i].getColor() == EPointColor.BLACK) {
-                    output += colorBlack + " ⬤ " + colorDefault;
+                    output.append(colorBlack).append(" ⬤ ").append(colorDefault);
                 } else if (stones[j][i].getColor() == EPointColor.WHITE) {
-                    output += colorWhite + " ⬤ " + colorDefault;
+                    output.append(colorWhite).append(" ⬤ ").append(colorDefault);
                 } else if (stones[j][i].getColor() == EPointColor.BORDER) {
-                    output += " X ";
+                    output.append(" X ");
                 }
             }
-            output += '\n';
+            output.append('\n');
         }
-        return output;
+        return output.toString();
+    }
+
+    public String getBoardView(){
+        // Clear the console
+        StringBuilder output = new StringBuilder("\033[H\033[2J");
+        System.out.flush();
+        for (int i = 0; i <= size + 1; i++) {
+            for (int j = 0; j <= size + 1; j++) {
+                if (stones[j][i].getColor() == EPointColor.NONE) {
+                    output.append(" + ");
+                } else if (stones[j][i].getColor() == EPointColor.BLACK) {
+                    output.append(colorBlack).append(" ⬤ ").append(colorDefault);
+                } else if (stones[j][i].getColor() == EPointColor.WHITE) {
+                    output.append(colorWhite).append(" ⬤ ").append(colorDefault);
+                } else if (stones[j][i].getColor() == EPointColor.BORDER) {
+                    output.append(" X ");
+                }
+            }
+            output.append('\n');
+        }
+        return output.toString();
     }
 
     @Override
@@ -100,6 +123,13 @@ public class Board implements IBoard {
         stones[x][y] = new Stone(x, y, player.getColor());
         calculateChains(stones);
         checkForCaptures(stones, player);
+    }
+
+    public void performMove(int x, int y, EPointColor color) {
+        stones[x][y] = new Stone(x, y, color);
+        calculateChains(stones);
+        checkForCaptures(stones, new Player(EPointColor.WHITE, 10));
+        checkForCaptures(stones, new Player(EPointColor.BLACK, 10));
     }
 
     @Override

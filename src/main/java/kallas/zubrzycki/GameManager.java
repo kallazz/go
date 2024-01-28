@@ -62,7 +62,7 @@ public class GameManager implements IGameManager {
 
     }
     @Override
-    public synchronized void makeMove(String input, int playerId) {
+    public synchronized void makeMove(String input, int playerId, boolean addToDatabase) {
         // Quit if it's not this player's turn
         if(currentPlayer == null){
             return;
@@ -91,7 +91,7 @@ public class GameManager implements IGameManager {
                 board.performMove(x, y, currentPlayer);
                 try {
                     current_turn++;
-                    db.insertNewMove(game_id, current_turn, input);
+                    if (addToDatabase) db.insertNewMove(game_id, current_turn, input);
 
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -107,7 +107,7 @@ public class GameManager implements IGameManager {
                 board.addErrorMessage("Wrong move - you are being forced to pass", playerId);
                 current_turn++;
                 try {
-                    db.insertNewMove(game_id, current_turn, "pass");
+                    if (addToDatabase) db.insertNewMove(game_id, current_turn, "pass");
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -117,7 +117,7 @@ public class GameManager implements IGameManager {
             try {
                 System.out.println(currentPlayer.getColor().toString() + ": " + input);
                 current_turn++;
-                db.insertNewMove(game_id, current_turn, input);
+                if (addToDatabase) db.insertNewMove(game_id, current_turn, input);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

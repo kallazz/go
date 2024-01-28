@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import static java.lang.Thread.sleep;
+
 public class ClientApp {
 
     private final Client client = new Client();
@@ -81,10 +83,16 @@ public class ClientApp {
     }
 
     public void replayGame(int gameId) throws SQLException {
+
         SQLLiteJDBC db = new SQLLiteJDBC("jdbc:sqlite:database.db");
         int i = 1;
         Statement statement = db.getConnection().createStatement();
 
+        // Replay the move using moveText
+        Board board = Board.getInstance();
+        GameManager gameManager = new GameManager();
+        board.initialize(19, gameManager);
+        gameManager.initializeGame(0, 1);
         while (true) {
             String query = "SELECT move_text FROM moves WHERE game_id=" + gameId + " AND move_number=" + i;
             ResultSet rs = statement.executeQuery(query);
@@ -92,15 +100,27 @@ public class ClientApp {
             if (!rs.next()) {  // No more moves found
                 break;
             }
-            if(i % 2 == 1){
-                System.out.println(i + ". BLACK: " + rs.getString("move_text"));
-            } else {
-                System.out.println(i + ". WHITE: " + rs.getString("move_text"));
+            String move_text = rs.getString("move_text");
+
+
+
+
+            String input_words[] = move_text.split(" ");
+            if(input_words.length == 3){
+                int x = Integer.parseInt(input_words[1]);
+                int y = Integer.parseInt(input_words[2]);
+                if(i % 2 == 1){
+                    board.performMove(x, y, EPointColor.BLACK);
+                } else {
+                    board.performMove(x, y, EPointColor.WHITE);
+                }
             }
-
-            // Replay the move using moveText
-
-
+            System.out.println(board.getBoardView());
+            try {
+                sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             i++;
         }
         statement.close();
