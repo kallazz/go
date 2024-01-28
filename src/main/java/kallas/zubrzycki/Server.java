@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 
-// TODO: remove na disconnecie, jakiś makemove w gamemanager(mutex?)  
 public class Server {
     private ServerSocket serverSocket;
     private ClientHandler[] clientHandlers = {null, null}; // First handler has id=0 and second handler id=1
@@ -20,8 +19,7 @@ public class Server {
 
     public void start(int port) {
         try {
-            String ipAddress = "127.0.0.1";
-            serverSocket = new ServerSocket(port, 0, InetAddress.getByName(ipAddress));
+            serverSocket = new ServerSocket(port);
             System.out.println("Server started on port " + port);
             waitForPlayers(port);
         } catch (IOException e) {
