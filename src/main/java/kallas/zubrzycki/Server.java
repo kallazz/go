@@ -21,20 +21,11 @@ public class Server {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port " + port);
-            while (numberOfPlayers < 2) {
-                Socket clientSocket = serverSocket.accept(); // Wait for a new connection
-
-                addAndStartClientHandler(clientSocket);
-
-                System.out.println("Client connected to the server");
-                numberOfPlayers++;
-            }
+            waitForPlayers(port);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        System.out.println("2 players connected. The game is starting");
-        isGameActive = true;
 
         gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers[0], 0));
         gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers[1], 1));
@@ -81,12 +72,40 @@ public class Server {
         stop();
     }
 
-    private void addGameToDb() {
-        try {
-            gameManager.addGameToDatabase();
-            System.out.println("Game added to the database");
-        } catch (SQLException e) {
-            System.out.println("Game couldn't get added to the database");
+    private void waitForPlayers(int port) throws IOException {
+        while (true) {
+            while (numberOfPlayers < 2) {
+                Socket clientSocket = serverSocket.accept(); // Wait for a new connection
+
+                addAndStartClientHandler(clientSocket);
+
+                System.out.println("Client connected to the server");
+                numberOfPlayers++;
+            }
+
+            if (clientHandlers[0].isActive() && clientHandlers[1].isActive()) {
+                break;
+            }
+
+            if (!clientHandlers[0].isActive()) {
+                numberOfPlayers--;
+                clientHandlers[0] = null;
+            }
+            if (!clientHandlers[1].isActive()) {
+                numberOfPlayers--;
+                clientHandlers[1] = null;
+            }
+        }
+
+        System.out.println("2 players connected. The game is starting");
+        isGameActive = true;
+
+        // To make sure that every type of disconnection is handled
+        if (!clientHandlers[0].isActive()) {
+            finishGameFaster(0);
+        }
+        if (!clientHandlers[1].isActive()) {
+            finishGameFaster(1);
         }
     }
 
@@ -102,6 +121,15 @@ public class Server {
 
     }
 
+    private void addGameToDb() {
+        try {
+            gameManager.addGameToDatabase();
+            System.out.println("Game added to the database");
+        } catch (SQLException e) {
+            System.out.println("Game couldn't get added to the database");
+        }
+    }
+
     private void addAndStartClientHandler(Socket clientSocket) {
         if (clientHandlers[0] == null) {
             clientHandlers[0] = new ClientHandler(clientSocket, 0);
@@ -115,22 +143,29 @@ public class Server {
 
     private class ClientHandler extends Thread {
         private Socket clientSocket;
-        private int id;
         private BufferedReader userInput;
         private PrintWriter userOutput;
+        private int id;
+        private boolean isClientConnected = false;
 
         public ClientHandler(Socket socket, int id) {
             this.clientSocket = socket;
             this.id = id;
+            this.isClientConnected = true;
         }
 
         public ClientHandler(Socket socket) {
             this.clientSocket = socket;
             this.id = 999; // BOT
+            this.isClientConnected = true;
         }
 
         public int getPlayerId() {
-            return this.id;
+            return id;
+        }
+
+        public boolean isActive() {
+            return isClientConnected;
         }
 
         public void sendMessage(String message) {
@@ -152,6 +187,9 @@ public class Server {
                         gameManager.makeMove(inputLine, id);
                     }
                 }
+                System.out.println("Client disconnected from the server");
+                clientSocket.close();
+                isClientConnected = false;
 
                 if (isGameActive) {
                     finishGameFaster(id);
