@@ -6,6 +6,7 @@ public class Stone implements IStone {
     private int y;
     private ChainOfStones chain;
     private boolean visited;
+    public boolean visitedDuringScoreCount = false;
 
     public Stone(int x, int y, EPointColor color) {
         this.x = x;

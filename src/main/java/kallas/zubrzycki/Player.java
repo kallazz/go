@@ -5,6 +5,16 @@ import java.util.Scanner;
 public class Player implements IPlayer {
 
     private int capturedStones = 0;
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    private int score = 0;
     private Scanner scanner = new Scanner(System.in);
     private EPointColor color;
     private int id;

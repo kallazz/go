@@ -191,7 +191,7 @@ public class Board implements IBoard {
         for(Stone[] stoneArray : stones) {
             for(Stone stone : stoneArray) {
                 if(stone != null){
-                    if( (stone.getColor() == EPointColor.BLACK || stone.getColor() == EPointColor.WHITE) && stone.getChain() == null){
+                    if( (stone.getColor() == EPointColor.BLACK || stone.getColor() == EPointColor.WHITE || stone.getColor() == EPointColor.NONE) && stone.getChain() == null){
                         assignChain(stone, stones);
                     }
                 }
@@ -285,41 +285,55 @@ public class Board implements IBoard {
         return stones;
     }
 
-    public List<List<Stone>> findTerritories(EPointColor targetColor){
-        List<List<Stone>> territories = new ArrayList<>();
-        Set<Stone> visited = new HashSet<>();
+    public int countPlayerScore(Player player){
+        EPointColor playerColor = player.getColor();
+        int score = 0;
 
-        for(int x = 1; x <= size; x++) {
-            for(int y = 1; y<= size; y++) {
-                Stone stone = stones[x][y];
-                if(stone.getColor() == EPointColor.NONE && !visited.contains(stone)) {
-                    List<Stone> group = new ArrayList<>();
-                    if(isTerritorySurrounded(stone, targetColor, visited, group)){
-                        territories.add(group);
+        for(Stone[] stoneArray : stones){
+            for(Stone stone : stoneArray) {
+                if(stone.getColor() == EPointColor.NONE && !stone.visitedDuringScoreCount){
+                    FloodFillResult result = floodFill(stone);
+                    if(result.surroundingColors.size() == 1 && result.surroundingColors.contains(playerColor)){
+                        score += result.count;
                     }
                 }
             }
         }
-        return territories;
+
+        return score;
     }
 
-    private boolean isTerritorySurrounded(Stone stone, EPointColor targetColor, Set<Stone> visited, List<Stone> group){
-        if (!stone.doesExist() || visited.contains(stone)) {
-            return true;
-        }
-        if(stone.getColor() != EPointColor.NONE) {
-            return stone.getColor() == targetColor || stone.getColor() == EPointColor.BORDER;
-        }
-        visited.add(stone);
-        group.add(stone);
-        boolean surrounded = true;
+
+    private FloodFillResult floodFill(Stone stone){
+        stone.visitedDuringScoreCount = true;
+
+        Set<EPointColor> surroundingColors = new HashSet<>();
+        int count = 1;
         int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         for(int[] dir : directions) {
-            Stone nextStone = getBoardPoint(stone.getX() + dir[0], stone.getY() + dir[1]);
-            if (nextStone != null && !isTerritorySurrounded(nextStone, targetColor, visited, group)) {
-                surrounded = false;
+            if(isValidPoint(stone.getX() + dir[0], stone.getY() + dir[1])){
+                Stone adjacentStone = stones[stone.getX() + dir[0]][stone.getY() + dir[1]];
+
+                    if(adjacentStone.getColor() == EPointColor.WHITE|| adjacentStone.getColor() == EPointColor.BLACK){
+                        surroundingColors.add(adjacentStone.getColor());
+                    } else if(adjacentStone.getColor() == EPointColor.NONE){
+                        if(adjacentStone.visitedDuringScoreCount == false){
+                            FloodFillResult result = floodFill(adjacentStone);
+                            surroundingColors.addAll(result.surroundingColors);
+                            count += result.count;
+                        }
+                    }
+
             }
+
+
         }
-        return surrounded;
+
+        return new FloodFillResult(surroundingColors, count);
     }
+
+    private boolean isValidPoint(int x, int y) {
+        return x >= 1 && x < size && y >= 1 && y < size;
+    }
+
 }

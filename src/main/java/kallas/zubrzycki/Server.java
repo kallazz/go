@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 // TODO: remove na disconnecie, jakiś makemove w gamemanager(mutex?)  
@@ -58,10 +59,21 @@ public class Server {
                 ex.printStackTrace();
             }
         }
-
+        //WHAT HAPPENS AFTER THE GAME
+        //Add game to database
+        gameManager.countScore();
+        try {
+            gameManager.addGameToDatabase();
+        } catch (SQLException e) {
+            System.out.println("Game not added to Database");
+        }
+        String winner = gameManager.getWinner();
+        String results = "The final score is BLACK - " + gameManager.getPlayer1().getScore() + " : " + gameManager.getPlayer2().getScore() + " - WHITE";
+        firstClientHandler.sendMessage(results);
+        secondClientHandler.sendMessage(results);
         firstClientHandler.sendMessage("The game is over");
         secondClientHandler.sendMessage("The game is over");
-        System.out.println("The game is finished");
+        System.out.println("The game is finished!");
         stop();
     }
 

@@ -32,6 +32,16 @@ public class SQLLiteJDBC {
         }
     }
 
+    public void insertNewGame(int game_id, String winner, Date date) throws SQLException {
+        String sql = "INSERT INTO games (game_id, winner, date) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, game_id);
+            pstmt.setString(2, winner);
+            pstmt.setDate(3, date);
+            pstmt.executeUpdate();
+        }
+    }
+
     SQLLiteJDBC(String url) throws SQLException {
         this.connection = DriverManager.getConnection(url);
     }

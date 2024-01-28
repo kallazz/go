@@ -1,5 +1,7 @@
 package kallas.zubrzycki;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -8,12 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager implements IGameManager {
-    private static int BOARD_SIZE = 19;
+    private static int BOARD_SIZE = 5;
 
     private Board board;
     private Player player1;
+    private int player1score;
     private Player player2;
+    private int player2score;
     private Player currentPlayer;
+    private String winner;
     private boolean isPassedPlayer1 = false;
     private boolean isPassedPlayer2 = false;
     private boolean didBothPlayersPass = false;
@@ -56,9 +61,7 @@ public class GameManager implements IGameManager {
         currentPlayer = player1;
 
         try {
-            System.out.println("DUPA -2");
             db = new SQLLiteJDBC("jdbc:sqlite:database.db");
-            System.out.println("DUPA -1");
             game_id = obtainGameId(db);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -156,9 +159,29 @@ public class GameManager implements IGameManager {
         return false;
     }
 
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
+    }
+
     @Override
     public void countScore() {
+        player1score = board.countPlayerScore(player1);
+        player2score = board.countPlayerScore(player2);
+        if(player1score > player2score){
+            winner = player1.getColor().toString();
+        } else if(player1score < player2score){
+            winner = player2.getColor().toString();
+        } else {
+            winner = "DRAW!";
+        }
+    }
 
+    public String getWinner() {
+        return winner;
     }
 
     public boolean isGameFinished() {
@@ -168,6 +191,12 @@ public class GameManager implements IGameManager {
     public String getBoard(int playerId) {
         EPointColor playerColor = (player1.getId() == playerId) ? player1.getColor() : player2.getColor();
         return board.getBoardView(playerId, playerColor, currentPlayer.getColor());
+    }
+
+    public void addGameToDatabase() throws SQLException {
+        LocalDate today = LocalDate.now();
+        Date sqlDate = Date.valueOf(today);
+        db.insertNewGame(game_id, winner, sqlDate);
     }
 
     // *************************************** Observers ***************************************
