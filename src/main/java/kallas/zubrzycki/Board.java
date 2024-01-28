@@ -300,7 +300,9 @@ public class Board implements IBoard {
             for(Stone stone : stoneArray) {
                 if(stone.getColor() == EPointColor.NONE && !stone.visitedDuringScoreCount){
                     HashSet<EPointColor> surroundingColors = new HashSet<>();
-                    FloodFillResult result = floodFill(stone, surroundingColors);
+                    FloodFillResult result = floodFill(stone, surroundingColors, 0);
+                    System.out.println("Result count: " + result.count);
+                    System.out.println("Result surroundingColors: " + result.surroundingColors);
                     if(result.surroundingColors.size() == 1 && result.surroundingColors.contains(playerColor)){
                         score += result.count;
                     }
@@ -310,9 +312,10 @@ public class Board implements IBoard {
 
         return score;
     }
-    private FloodFillResult floodFill(Stone stone, HashSet<EPointColor> surroundingColors){
-        stone.visitedDuringScoreCount = true;
+    private FloodFillResult floodFill(Stone stone, HashSet<EPointColor> surroundingColors, int currentCount){
         int count = 1;
+        stone.visitedDuringScoreCount = true;
+        System.out.println(stone.getX() + ", " + stone.getY() + " currentCount:" + currentCount);
 
         int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         for (int[] dir : directions) {
@@ -323,7 +326,7 @@ public class Board implements IBoard {
                 Stone adjacentStone = stones[newX][newY];
                 if (adjacentStone.getColor() == EPointColor.NONE) {
                     if(adjacentStone.visitedDuringScoreCount == false){
-                        FloodFillResult result = floodFill(adjacentStone, surroundingColors);
+                        FloodFillResult result = floodFill(adjacentStone, surroundingColors, currentCount + count);
                         count += result.count;
                         surroundingColors.addAll(result.surroundingColors); // Merge surrounding colors
                     }

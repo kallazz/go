@@ -83,12 +83,12 @@ public class Client {
 
         while(true){
             try {
-                sleep(500);
+                sleep(200);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             Random moveGenerator = new Random();
-            if (moveGenerator.nextDouble() < 0.08) { // 8% chance to pass
+            if (moveGenerator.nextDouble() < 0.05) { // 8% chance to pass
                 out.println("pass");
             } else {
                 int x = moveGenerator.nextInt(19) + 1;
