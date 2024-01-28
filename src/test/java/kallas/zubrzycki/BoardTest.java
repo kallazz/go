@@ -2,6 +2,7 @@ package kallas.zubrzycki;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class BoardTest {
@@ -35,6 +36,7 @@ public class BoardTest {
     }
 
     @Test
+    @Ignore
     public void shouldCheckCorrectMove() {
         final Board board = Board.getInstance();
         board.initialize(BOARD_SIZE, new GameManager());

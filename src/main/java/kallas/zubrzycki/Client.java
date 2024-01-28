@@ -36,12 +36,13 @@ public class Client {
         }
     }
 
-    public void stopConnection() {
+    private void stopConnection() {
         try {
             in.close();
             out.close();
             clientSocket.close();
             receiveThread.interrupt();
+            System.exit(0);
         } catch (IOException e) {
             System.err.println("Error when closing client connection");
             e.printStackTrace();
@@ -54,7 +55,7 @@ public class Client {
             while ((line = in.readLine()) != null) {
                 if (line.trim().equals("The game is over")) {
                     System.out.println("Thank you for playing");
-                    System.exit(0);
+                    stopConnection();
                 }
                 System.out.println(line);
             }

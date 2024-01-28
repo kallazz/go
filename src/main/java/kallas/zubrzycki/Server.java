@@ -7,49 +7,31 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+
 // TODO: remove na disconnecie, jakiś makemove w gamemanager(mutex?)  
 public class Server {
     private ServerSocket serverSocket;
-    private List<ClientHandler> clientHandlers = new ArrayList<>();
+    private ClientHandler[] clientHandlers = {null, null}; // First handler has id=0 and second handler id=1
 
     private int numberOfPlayers = 0;
     protected GameManager gameManager = new GameManager();
-    protected boolean isGameStarted = false;
+    protected boolean isGameActive = false;
 
     public void start(int port) {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port " + port);
-            while (numberOfPlayers < 2) {
-                Socket clientSocket = serverSocket.accept(); // Wait for a new connection
-
-                ClientHandler clientHandler = new ClientHandler(clientSocket, numberOfPlayers);
-                clientHandlers.add(clientHandler);
-                clientHandler.start();
-
-                System.out.println("Client connected to the server");
-                numberOfPlayers++;
-            }
+            waitForPlayers(port);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            stop();
         }
 
-        System.out.println("2 players connected. The game is starting");
-        isGameStarted = true;
 
-        ClientHandler firstClientHandler = clientHandlers.get(0);
-        ClientHandler secondClientHandler = clientHandlers.get(1);
-        int firstPlayerId = clientHandlers.get(0).getPlayerId();
-        int secondPlayerId = clientHandlers.get(1).getPlayerId();
-        gameManager.attachObserver(new GameManagerObserver(gameManager, firstClientHandler, firstPlayerId));
-        gameManager.attachObserver(new GameManagerObserver(gameManager, secondClientHandler, secondPlayerId));
-        gameManager.initializeGame(firstPlayerId, secondPlayerId);
-        firstClientHandler.sendMessage(gameManager.getBoard(firstPlayerId));
-        secondClientHandler.sendMessage(gameManager.getBoard(secondPlayerId));
+        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers[0], 0));
+        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers[1], 1));
+        gameManager.initializeGame(0, 1);
+        clientHandlers[0].sendMessage(gameManager.getBoard(0));
+        clientHandlers[1].sendMessage(gameManager.getBoard(1));
 
         while (!gameManager.isGameFinished()) {
             try {
@@ -59,28 +41,79 @@ public class Server {
                 ex.printStackTrace();
             }
         }
-        //WHAT HAPPENS AFTER THE GAME
-        //Add game to database
+
+        // WHAT HAPPENS AFTER THE GAME
+        // Add game to database
+        isGameActive = false;
+        addGameToDb();
         gameManager.countScore();
-        try {
-            gameManager.addGameToDatabase();
-        } catch (SQLException e) {
-            System.out.println("Game not added to Database");
-        }
         String winner = gameManager.getWinner();
         String results = "The final score is BLACK - " + gameManager.getPlayer1().getScore() + " : " + gameManager.getPlayer2().getScore() + " - WHITE";
-        firstClientHandler.sendMessage(results);
-        secondClientHandler.sendMessage(results);
-        firstClientHandler.sendMessage("The game is over");
-        secondClientHandler.sendMessage("The game is over");
+        clientHandlers[0].sendMessage(results);
+        clientHandlers[1].sendMessage(results);
+        clientHandlers[0].sendMessage("The game is over");
+        clientHandlers[1].sendMessage("The game is over");
         System.out.println("The game is finished!");
         stop();
     }
 
-    public void stop() {
+    public void finishGameFaster(int stoppedPlayerId) {
+        isGameActive = false;
+        System.out.println("One of the clients disconnected. The game is over.");
+        addGameToDb();
+        if (clientHandlers[0].getPlayerId() == stoppedPlayerId) {
+            clientHandlers[1].sendMessage("Another player disconnected");
+            clientHandlers[1].sendMessage("The game is over");
+        } else {
+            clientHandlers[0].sendMessage("Another player disconnected");
+            clientHandlers[0].sendMessage("The game is over");
+        }
+
+        stop();
+    }
+
+    private void waitForPlayers(int port) throws IOException {
+        while (true) {
+            while (numberOfPlayers < 2) {
+                Socket clientSocket = serverSocket.accept(); // Wait for a new connection
+
+                addAndStartClientHandler(clientSocket);
+
+                System.out.println("Client connected to the server");
+                numberOfPlayers++;
+            }
+
+            if (clientHandlers[0].isActive() && clientHandlers[1].isActive()) {
+                break;
+            }
+
+            if (!clientHandlers[0].isActive()) {
+                numberOfPlayers--;
+                clientHandlers[0] = null;
+            }
+            if (!clientHandlers[1].isActive()) {
+                numberOfPlayers--;
+                clientHandlers[1] = null;
+            }
+        }
+
+        System.out.println("2 players connected. The game is starting");
+        isGameActive = true;
+
+        // To make sure that every type of disconnection is handled
+        if (!clientHandlers[0].isActive()) {
+            finishGameFaster(0);
+        }
+        if (!clientHandlers[1].isActive()) {
+            finishGameFaster(1);
+        }
+    }
+
+    private void stop() {
         try {
             System.out.println("Server successfully stopped");
             serverSocket.close();
+            System.exit(0);
         } catch (IOException e) {
             System.out.println("Error when closing the server socket");
             e.printStackTrace();
@@ -88,25 +121,51 @@ public class Server {
 
     }
 
+    private void addGameToDb() {
+        try {
+            gameManager.addGameToDatabase();
+            System.out.println("Game added to the database");
+        } catch (SQLException e) {
+            System.out.println("Game couldn't get added to the database");
+        }
+    }
+
+    private void addAndStartClientHandler(Socket clientSocket) {
+        if (clientHandlers[0] == null) {
+            clientHandlers[0] = new ClientHandler(clientSocket, 0);
+            clientHandlers[0].start();
+        } else {
+            clientHandlers[1] = new ClientHandler(clientSocket, 1);
+            clientHandlers[1].start();
+        }
+    }
+
 
     private class ClientHandler extends Thread {
         private Socket clientSocket;
-        private int id;
         private BufferedReader userInput;
         private PrintWriter userOutput;
+        private int id;
+        private boolean isClientConnected = false;
 
         public ClientHandler(Socket socket, int id) {
             this.clientSocket = socket;
             this.id = id;
+            this.isClientConnected = true;
         }
 
         public ClientHandler(Socket socket) {
             this.clientSocket = socket;
             this.id = 999; // BOT
+            this.isClientConnected = true;
         }
 
         public int getPlayerId() {
-            return this.id;
+            return id;
+        }
+
+        public boolean isActive() {
+            return isClientConnected;
         }
 
         public void sendMessage(String message) {
@@ -122,12 +181,18 @@ public class Server {
 
                 String inputLine;
                 while ((inputLine = userInput.readLine()) != null) {
-                    if (!isGameStarted) {
-                        userOutput.println("The game hasn't started yet!\u0004"); // TODO: Find a normal way to do this
+                    if (!isGameActive) {
+                        userOutput.println("The game hasn't started yet!\u0004");
                     } else {
                         gameManager.makeMove(inputLine, id);
                     }
+                }
+                System.out.println("Client disconnected from the server");
+                clientSocket.close();
+                isClientConnected = false;
 
+                if (isGameActive) {
+                    finishGameFaster(id);
                 }
             } catch (IOException e) {
                 System.out.println("Error when running ClientHandler");
