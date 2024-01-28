@@ -1,9 +1,7 @@
 package kallas.zubrzycki;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.sql.*;
-import java.util.List;
 import java.util.Set;
 
 public class Board implements IBoard {
@@ -100,7 +98,7 @@ public class Board implements IBoard {
     @Override
     public void performMove(int x, int y, EPointColor playerColor) {
         stones[x][y] = new Stone(x, y, playerColor);
-        calculateChains2(stones);
+        calculateChains(stones);
         checkForCaptures(stones, playerColor);
     }
 
@@ -150,7 +148,7 @@ public class Board implements IBoard {
 
         simulatedStones[newStone.getX()][newStone.getY()] = new Stone(newStone.getX(), newStone.getY(), newStone.getColor());
         resetChains(simulatedStones);
-        calculateChains2(simulatedStones);
+        calculateChains(simulatedStones);
         return newStone.countLiberties(simulatedStones);
     }
 
@@ -164,7 +162,7 @@ public class Board implements IBoard {
 
         simulatedStones[newStone.getX()][newStone.getY()] = new Stone(newStone.getX(), newStone.getY(), newStone.getColor());
         resetChains(simulatedStones);
-        calculateChains2(simulatedStones);
+        calculateChains(simulatedStones);
         return checkForCaptures(simulatedStones, newStone.getColor());
 
     }
@@ -216,7 +214,7 @@ public class Board implements IBoard {
         return 1;
     }
 
-    private void calculateChains2(Stone[][] stones) {
+    private void calculateChains(Stone[][] stones) {
         for(Stone[] stoneArray : stones) {
             for(Stone stone : stoneArray) {
                 if(stone != null){
@@ -257,33 +255,6 @@ public class Board implements IBoard {
         }
     }
 
-    private void calculateChains(Stone stone, ChainOfStones chain) {
-
-        if(stone.isVisited()){
-            return;
-        }
-
-        chain.addStone(stone);
-        stone.setChain(chain);
-
-        final int currentX = stone.getX();
-        final int currentY = stone.getY();
-        final EPointColor currentColor = stone.getColor();
-
-        if (stones[currentX + 1][currentY].doesExist() && stones[currentX + 1][currentY].getColor() == currentColor) {
-            calculateChains(stones[currentX + 1][currentY], chain);
-        }
-        if (stones[currentX][currentY + 1].doesExist() && stones[currentX][currentY + 1].getColor() == currentColor) {
-            calculateChains(stones[currentX][currentY + 1], chain);
-        }
-        if (stones[currentX - 1][currentY].doesExist() && stones[currentX - 1][currentY].getColor() == currentColor) {
-            calculateChains(stones[currentX - 1][currentY], chain);
-        }
-        if (stones[currentX][currentY - 1].doesExist() && stones[currentX][currentY - 1].getColor() == currentColor) {
-            calculateChains(stones[currentX][currentY - 1], chain);
-        }
-    }
-
     private void resetChains(Stone[][] stones) {
         for (int i = 1; i <= size; i++) {
             for (Stone stone: stones[i]) {
@@ -315,13 +286,21 @@ public class Board implements IBoard {
     }
 
     public int countPlayerScore(Player player){
+
+        for (Stone[] stoneArray : stones) {
+            for (Stone stone : stoneArray) {
+                stone.visitedDuringScoreCount = false;
+            }
+        }
+
         EPointColor playerColor = player.getColor();
         int score = 0;
 
         for(Stone[] stoneArray : stones){
             for(Stone stone : stoneArray) {
                 if(stone.getColor() == EPointColor.NONE && !stone.visitedDuringScoreCount){
-                    FloodFillResult result = floodFill(stone);
+                    HashSet<EPointColor> surroundingColors = new HashSet<>();
+                    FloodFillResult result = floodFill(stone, surroundingColors);
                     if(result.surroundingColors.size() == 1 && result.surroundingColors.contains(playerColor)){
                         score += result.count;
                     }
@@ -331,38 +310,34 @@ public class Board implements IBoard {
 
         return score;
     }
-
-
-    private FloodFillResult floodFill(Stone stone){
+    private FloodFillResult floodFill(Stone stone, HashSet<EPointColor> surroundingColors){
         stone.visitedDuringScoreCount = true;
-
-        Set<EPointColor> surroundingColors = new HashSet<>();
         int count = 1;
+
         int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-        for(int[] dir : directions) {
-            if(isValidPoint(stone.getX() + dir[0], stone.getY() + dir[1])){
-                Stone adjacentStone = stones[stone.getX() + dir[0]][stone.getY() + dir[1]];
+        for (int[] dir : directions) {
+            int newX = stone.getX() + dir[0];
+            int newY = stone.getY() + dir[1];
 
-                    if(adjacentStone.getColor() == EPointColor.WHITE|| adjacentStone.getColor() == EPointColor.BLACK){
-                        surroundingColors.add(adjacentStone.getColor());
-                    } else if(adjacentStone.getColor() == EPointColor.NONE){
-                        if(adjacentStone.visitedDuringScoreCount == false){
-                            FloodFillResult result = floodFill(adjacentStone);
-                            surroundingColors.addAll(result.surroundingColors);
-                            count += result.count;
-                        }
+            if (isValidPoint(newX, newY)) {
+                Stone adjacentStone = stones[newX][newY];
+                if (adjacentStone.getColor() == EPointColor.NONE) {
+                    if(adjacentStone.visitedDuringScoreCount == false){
+                        FloodFillResult result = floodFill(adjacentStone, surroundingColors);
+                        count += result.count;
+                        surroundingColors.addAll(result.surroundingColors); // Merge surrounding colors
                     }
-
+                } else if (adjacentStone.getColor() == EPointColor.WHITE || adjacentStone.getColor() == EPointColor.BLACK) {
+                    surroundingColors.add(adjacentStone.getColor());
+                }
             }
-
-
         }
 
         return new FloodFillResult(surroundingColors, count);
     }
 
     private boolean isValidPoint(int x, int y) {
-        return x >= 1 && x < size && y >= 1 && y < size;
+        return x >= 1 && x <= size && y >= 1 && y <= size;
     }
 
 }
