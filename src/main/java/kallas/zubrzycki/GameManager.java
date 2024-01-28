@@ -58,8 +58,6 @@ public class GameManager implements IGameManager {
         player1 = new Player(EPointColor.BLACK, player1Id);
         player2 = new Player(EPointColor.WHITE, player2Id);
         currentPlayer = player1;
-
-
     }
     @Override
     public synchronized void makeMove(String input, int playerId, boolean addToDatabase) {
@@ -69,13 +67,13 @@ public class GameManager implements IGameManager {
         }
         if (playerId != currentPlayer.getId()) {
             board.addErrorMessage("This is not your turn!", playerId);
-            notifyObservers();
+            notifyObserver(playerId);
             return;
         }
 
         // Quit if input is incorrect
         if (!parseInput(input, playerId)) {
-            notifyObservers();
+            notifyObserver(playerId);
             return;
         }
 
@@ -225,5 +223,9 @@ public class GameManager implements IGameManager {
         for (IGameManagerObserver observer : observers) {
             observer.update();
         }
+    }
+
+    public void notifyObserver(int playerId) {
+        observers.get(playerId).update();
     }
 }
