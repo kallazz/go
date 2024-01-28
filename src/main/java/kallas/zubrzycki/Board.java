@@ -2,7 +2,6 @@ package kallas.zubrzycki;
 
 import java.util.HashSet;
 import java.sql.*;
-import java.util.Set;
 
 public class Board implements IBoard {
     private static String colorBlack = "\u001B[34m";
@@ -30,7 +29,7 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void initialize(int size, GameManager gameManager) {
+    public void initialize(final int size, final GameManager gameManager) {
         this.gm = gameManager;
         this.size = size;
         stones = new Stone[size + 2][size + 2];
@@ -50,10 +49,10 @@ public class Board implements IBoard {
     }
 
     @Override
-    public String getBoardView(int playerId, EPointColor playerColor, EPointColor currentPlayerColor) {
+    public String getBoardView(final int playerId, final EPointColor playerColor, final EPointColor currentPlayerColor) {
         // Clear the console
         StringBuilder output = new StringBuilder("\033[H\033[2J");
- 
+
         // Print info about this player's color and whose turn it is
         output.append("You are playing as ");
         if (playerColor == EPointColor.BLACK) {
@@ -119,13 +118,13 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void performMove(int x, int y, Player player) {
+    public void performMove(final int x, final int y, final Player player) {
         stones[x][y] = new Stone(x, y, player.getColor());
         calculateChains(stones);
         checkForCaptures(stones, player);
     }
 
-    public void performMove(int x, int y, EPointColor color) {
+    public void performMove(final int x, final int y, final EPointColor color) {
         stones[x][y] = new Stone(x, y, color);
         calculateChains(stones);
         checkForCaptures(stones, new Player(EPointColor.WHITE, 10));
@@ -133,14 +132,14 @@ public class Board implements IBoard {
     }
 
     @Override
-    public boolean checkMove(int x, int y, EPointColor playerColor, int playerId) {
+    public boolean checkMove(final int x, final int y, final EPointColor playerColor, final int playerId) {
         //Check if x and y are within boundaries
-        if(!(x <= size && y <= size && x >= 1 && y >= 1)){
+        if (!(x <= size && y <= size && x >= 1 && y >= 1)) {
             addErrorMessage("x or y out of bounds", playerId);
             return false;
         }
         // Check if the spot is empty
-        if(stones[x][y].getColor() != EPointColor.NONE){
+        if (stones[x][y].getColor() != EPointColor.NONE) {
             addErrorMessage("That point was taken by " + stones[x][y].getColor(), playerId);
             return false;
         }
@@ -149,7 +148,7 @@ public class Board implements IBoard {
 
         //Check for KO rule
         try {
-            if(simulateNewStoneAndCheckForKORuleViolation(newStone) == 0){
+            if (simulateNewStoneAndCheckForKORuleViolation(newStone) == 0) {
                 addErrorMessage("KO rule would be violated", playerId);
                 return false;
             }
@@ -157,21 +156,18 @@ public class Board implements IBoard {
             System.out.println("Couldn't check for Ko");
         }
 
-        if(simulateNewStoneAndCountLiberties(newStone) == 0){
-            if(simulateNewStoneAndCheckForCaptures(newStone) == false){
-                addErrorMessage("There must be at least one liberty, unless you capture", playerId);
-                return false;
-            }
+        if (simulateNewStoneAndCountLiberties(newStone) == 0 && !simulateNewStoneAndCheckForCaptures(newStone)) {
+            addErrorMessage("There must be at least one liberty, unless you capture", playerId);
+            return false;
         }
 
         return true;
     }
 
-    public int simulateNewStoneAndCountLiberties(Stone newStone){
-
+    public int simulateNewStoneAndCountLiberties(final Stone newStone) {
         Stone[][] simulatedStones = new Stone[size + 2][size + 2];
-        for(Stone[] stones1 : stones){
-            for(Stone stone : stones1){
+        for (Stone[] stones1 : stones) {
+            for (Stone stone : stones1) {
                 simulatedStones[stone.getX()][stone.getY()] = new Stone(stone.getX(), stone.getY(), stone.getColor());
             }
         }
@@ -182,10 +178,10 @@ public class Board implements IBoard {
         return newStone.countLiberties(simulatedStones);
     }
 
-    public boolean simulateNewStoneAndCheckForCaptures(Stone newStone){
+    public boolean simulateNewStoneAndCheckForCaptures(final Stone newStone) {
         Stone[][] simulatedStones = new Stone[size + 2][size + 2];
-        for(Stone[] stones1 : stones){
-            for(Stone stone : stones1){
+        for (Stone[] stones1 : stones) {
+            for (Stone stone : stones1) {
                 simulatedStones[stone.getX()][stone.getY()] = new Stone(stone.getX(), stone.getY(), stone.getColor());
             }
         }
@@ -194,23 +190,20 @@ public class Board implements IBoard {
         resetChains(simulatedStones);
         calculateChains(simulatedStones);
         return checkForCaptures(simulatedStones, new Player(newStone.getColor(), 9));
-
     }
 
-    public boolean checkForCaptures(Stone[][] allStones, Player player) {
+    public boolean checkForCaptures(final Stone[][] allStones, final Player player) {
         EPointColor color = player.getColor();
         boolean anyCaptures = false;
 
-        for(Stone[] stones1 : allStones){
-            for(Stone stone : stones1){
-                if(stone.getChain() != null && stone.getColor() != color){
-                    if(stone.getChain().countLiberties(allStones) == 0){
-                        anyCaptures = true;
-                        for(Stone capturedStone : stone.getChain().getStones()) {
-                            player.setScore(player.getScore() + 1);
-                            stones[capturedStone.getX()][capturedStone.getY()].setColor(EPointColor.NONE);
-                            stones[capturedStone.getX()][capturedStone.getY()].setChain(null);
-                        }
+        for (Stone[] stones1 : allStones) {
+            for (Stone stone : stones1) {
+                if (stone.getChain() != null && stone.getColor() != color && stone.getChain().countLiberties(allStones) == 0) {
+                    anyCaptures = true;
+                    for (Stone capturedStone : stone.getChain().getStones()) {
+                        player.setScore(player.getScore() + 1);
+                        stones[capturedStone.getX()][capturedStone.getY()].setColor(EPointColor.NONE);
+                        stones[capturedStone.getX()][capturedStone.getY()].setChain(null);
                     }
                 }
 
@@ -220,9 +213,9 @@ public class Board implements IBoard {
     }
 
 
-    public int simulateNewStoneAndCheckForKORuleViolation(Stone newStone) throws SQLException {
+    public int simulateNewStoneAndCheckForKORuleViolation(final Stone newStone) throws SQLException {
         SQLLiteJDBC db = gm.getDatabase();
-        String query = "SELECT move_text FROM moves WHERE game_id="+gm.getGame_id() + " AND move_number=" + (gm.getCurrent_turn() - 1);
+        String query = "SELECT move_text FROM moves WHERE game_id=" + gm.getGame_id() + " AND move_number=" + (gm.getCurrent_turn() - 1);
         Statement statement = db.getConnection().createStatement();
 
         try {
@@ -245,26 +238,24 @@ public class Board implements IBoard {
         return 1;
     }
 
-    private void calculateChains(Stone[][] stones) {
-        for(Stone[] stoneArray : stones) {
-            for(Stone stone : stoneArray) {
-                if(stone != null){
-                    if( (stone.getColor() == EPointColor.BLACK || stone.getColor() == EPointColor.WHITE || stone.getColor() == EPointColor.NONE) && stone.getChain() == null){
-                        assignChain(stone, stones);
-                    }
+    private void calculateChains(final Stone[][] stones) {
+        for (Stone[] stoneArray : stones) {
+            for (Stone stone : stoneArray) {
+                if (stone != null && (stone.getColor() == EPointColor.BLACK || stone.getColor() == EPointColor.WHITE || stone.getColor() == EPointColor.NONE) && stone.getChain() == null) {
+                    assignChain(stone, stones);
                 }
 
             }
         }
     }
 
-    private void assignChain(Stone stone, Stone[][] allStones) {
+    private void assignChain(final Stone stone, final Stone[][] allStones) {
         int x = stone.getX();
         int y = stone.getY();
         ChainOfStones newChain;
 
-        if(allStones[x + 1][y].doesExist() && allStones[x + 1][y].getColor() == stone.getColor() && allStones[x + 1][y].getChain() != null){
-            newChain = allStones[x+1][y].getChain();
+        if (allStones[x + 1][y].doesExist() && allStones[x + 1][y].getColor() == stone.getColor() && allStones[x + 1][y].getChain() != null) {
+            newChain = allStones[x + 1][y].getChain();
             stone.setChain(newChain);
             newChain.addStone(stone);
         } else if (allStones[x][y + 1].doesExist() && allStones[x][y + 1].getColor() == stone.getColor() && allStones[x][y + 1].getChain() != null) {
@@ -272,11 +263,11 @@ public class Board implements IBoard {
             stone.setChain(newChain);
             newChain.addStone(stone);
         } else if (allStones[x - 1][y].doesExist() && allStones[x - 1][y].getColor() == stone.getColor() && allStones[x - 1][y].getChain() != null) {
-            newChain = allStones[x-1][y].getChain();
+            newChain = allStones[x - 1][y].getChain();
             stone.setChain(newChain);
             newChain.addStone(stone);
         } else if (allStones[x][y - 1].doesExist() && allStones[x][y - 1].getColor() == stone.getColor() && allStones[x][y - 1].getChain() != null) {
-            newChain = allStones[x][y-1].getChain();
+            newChain = allStones[x][y - 1].getChain();
             stone.setChain(newChain);
             newChain.addStone(stone);
         } else {
@@ -286,7 +277,7 @@ public class Board implements IBoard {
         }
     }
 
-    private void resetChains(Stone[][] stones) {
+    private void resetChains(final Stone[][] stones) {
         for (int i = 1; i <= size; i++) {
             for (Stone stone: stones[i]) {
                 if (stone != null) {
@@ -297,17 +288,17 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void addErrorMessage(String errorMessage, int playerId) {
+    public void addErrorMessage(final String errorMessage, final int playerId) {
         this.errorMessages[playerId] = errorMessage;
     }
 
-    public Stone[][] getStones(){
+    public Stone[][] getStones() {
         return stones;
     }
 
 
     @Override
-    public Stone getBoardPoint(int x, int y) {
+    public Stone getBoardPoint(final int x, final int y) {
         return stones[x][y];
     }
 
@@ -316,7 +307,7 @@ public class Board implements IBoard {
         return stones;
     }
 
-    public int countPlayerScore(Player player){
+    public int countPlayerScore(final Player player){
 
         for (Stone[] stoneArray : stones) {
             for (Stone stone : stoneArray) {
@@ -327,27 +318,21 @@ public class Board implements IBoard {
         EPointColor playerColor = player.getColor();
         int score = 0;
 
-        for(Stone[] stoneArray : stones){
-            for(Stone stone : stoneArray) {
-                if(stone.getColor() == EPointColor.NONE && !stone.visitedDuringScoreCount){
+        for (Stone[] stoneArray : stones) {
+            for (Stone stone : stoneArray) {
+                if (stone.getColor() == EPointColor.NONE && !stone.visitedDuringScoreCount) {
                     HashSet<EPointColor> surroundingColors = new HashSet<>();
                     FloodFillResult result = floodFill(stone, surroundingColors, 0);
-                    //System.out.println("Result count: " + result.count);
-                    //System.out.println("Result surroundingColors: " + result.surroundingColors);
-                    //System.out.println("Player color: " + playerColor);
-                    //System.out.println("SurroundingColors size: " + result.surroundingColors.size());
-                    //System.out.println("Does it contain player color? " + (result.surroundingColors.contains(playerColor) ? "yes" : "no"));
-                    if(result.surroundingColors.size() == 1 && result.surroundingColors.contains(playerColor)){
-                        //System.out.println("Adding score! +=" + result.count);
+                    if (result.surroundingColors.size() == 1 && result.surroundingColors.contains(playerColor)) {
                         score += result.count;
                     }
                 }
             }
         }
-       // System.out.println("Final score: " + score);
         return score;
     }
-    private FloodFillResult floodFill(Stone stone, HashSet<EPointColor> surroundingColors, int currentCount){
+
+    private FloodFillResult floodFill(final Stone stone, final HashSet<EPointColor> surroundingColors, final int currentCount){
         int count = 1;
         stone.visitedDuringScoreCount = true;
         //System.out.println(stone.getX() + ", " + stone.getY() + " currentCount:" + currentCount);
@@ -374,7 +359,7 @@ public class Board implements IBoard {
         return new FloodFillResult(surroundingColors, count);
     }
 
-    private boolean isValidPoint(int x, int y) {
+    private boolean isValidPoint(final int x, final int y) {
         return x >= 1 && x <= size && y >= 1 && y <= size;
     }
 

@@ -44,7 +44,7 @@ public class Stone implements IStone {
 
     @Override
     public boolean doesExist() {
-        return (color == EPointColor.NONE || color == EPointColor.BORDER) ? false : true;
+        return !(color == EPointColor.NONE || color == EPointColor.BORDER);
     }
 
     @Override

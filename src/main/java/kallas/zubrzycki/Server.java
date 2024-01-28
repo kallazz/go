@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
@@ -21,14 +20,14 @@ public class Server {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port " + port);
-            waitForPlayers(port);
+            waitForPlayers();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 
-        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers[0], 0));
-        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers[1], 1));
+        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers[0]));
+        gameManager.attachObserver(new GameManagerObserver(gameManager, clientHandlers[1]));
         gameManager.initializeGame(0, 1);
         clientHandlers[0].sendMessage(gameManager.getBoard(0));
         clientHandlers[1].sendMessage(gameManager.getBoard(1));
@@ -47,7 +46,6 @@ public class Server {
         isGameActive = false;
         addGameToDb();
         gameManager.countScore();
-        String winner = gameManager.getWinner();
         String results = "The final score is BLACK - " + gameManager.getPlayer1().getScore() + " : " + gameManager.getPlayer2().getScore() + " - WHITE";
         clientHandlers[0].sendMessage(results);
         clientHandlers[1].sendMessage(results);
@@ -72,7 +70,7 @@ public class Server {
         stop();
     }
 
-    private void waitForPlayers(int port) throws IOException {
+    private void waitForPlayers() throws IOException {
         while (true) {
             while (numberOfPlayers < 2) {
                 Socket clientSocket = serverSocket.accept(); // Wait for a new connection
@@ -154,12 +152,6 @@ public class Server {
             this.isClientConnected = true;
         }
 
-        public ClientHandler(Socket socket) {
-            this.clientSocket = socket;
-            this.id = 999; // BOT
-            this.isClientConnected = true;
-        }
-
         public int getPlayerId() {
             return id;
         }
@@ -206,7 +198,7 @@ public class Server {
         private GameManager gameManager;
         private ClientHandler clientHandler;
 
-        public GameManagerObserver(GameManager gameManager, ClientHandler clientHandler, int playerId) {
+        public GameManagerObserver(GameManager gameManager, ClientHandler clientHandler) {
             this.gameManager = gameManager;
             this.clientHandler = clientHandler;
         }
