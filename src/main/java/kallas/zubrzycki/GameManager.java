@@ -1,10 +1,7 @@
 package kallas.zubrzycki;
 
-import java.sql.Date;
+import java.sql.*;
 import java.time.LocalDate;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,24 +31,26 @@ public class GameManager implements IGameManager {
 
     int obtainGameId(SQLLiteJDBC db) throws SQLException {
 
-        System.out.println("DUPA 0");
         Statement statement = db.getConnection().createStatement();
-        System.out.println("DUPA 1");
         String query = "SELECT MAX(game_id) AS max_value FROM games";
-        System.out.println("DUPA 2");
         ResultSet resultSet = statement.executeQuery(query);
-        System.out.println("DUPA 3");
 
         if (resultSet.next()) {
             int highestValue = resultSet.getInt("max_value");
             return highestValue + 1;
+
         }
         return 1;
     }
 
     @Override
     public void initializeGame(int player1Id, int player2Id) {
-
+        try {
+            db = new SQLLiteJDBC("jdbc:sqlite:database.db");
+            game_id = obtainGameId(db);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         current_turn = 0;
 
         board = Board.getInstance();
@@ -60,12 +59,7 @@ public class GameManager implements IGameManager {
         player2 = new Player(EPointColor.WHITE, player2Id);
         currentPlayer = player1;
 
-        try {
-            db = new SQLLiteJDBC("jdbc:sqlite:database.db");
-            game_id = obtainGameId(db);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
     }
     @Override
     public synchronized void makeMove(String input, int playerId) {
@@ -92,7 +86,9 @@ public class GameManager implements IGameManager {
 
                 board.performMove(x, y, currentPlayer.getColor());
                 try {
+                    current_turn++;
                     db.insertNewMove(game_id, current_turn, input);
+
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -109,6 +105,7 @@ public class GameManager implements IGameManager {
         } else {
 
             try {
+                current_turn++;
                 db.insertNewMove(game_id, current_turn, input);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -197,6 +194,14 @@ public class GameManager implements IGameManager {
         LocalDate today = LocalDate.now();
         Date sqlDate = Date.valueOf(today);
         db.insertNewGame(game_id, winner, sqlDate);
+    }
+
+    public int getGame_id() {
+        return game_id;
+    }
+
+    public int getCurrent_turn() {
+        return current_turn;
     }
 
     // *************************************** Observers ***************************************

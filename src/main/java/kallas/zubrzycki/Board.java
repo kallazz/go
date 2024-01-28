@@ -2,6 +2,7 @@ package kallas.zubrzycki;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.sql.*;
 import java.util.List;
 import java.util.Set;
 
@@ -117,17 +118,24 @@ public class Board implements IBoard {
         }
         Stone newStone = new Stone(x, y, playerColor);
         //Check if after placing the stone, there is at least one liberty - Unless there is a capture happening "Suicide rule"
+
+        //Check for KO rule
+        try {
+            if(simulateNewStoneAndCheckForKORuleViolation(newStone) == 0){
+                addErrorMessage("KO rule would be violated", playerId);
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("Couldn't check for Ko");
+        }
+
         if(simulateNewStoneAndCountLiberties(newStone) == 0){
             if(simulateNewStoneAndCheckForCaptures(newStone) == false){
                 addErrorMessage("There must be at least one liberty, unless you capture", playerId);
                 return false;
             }
         }
-        //Check for KO rule
-        if(simulateNewStoneAndCheckForKORuleViolation() == 0){
-            addErrorMessage("KO rule would be violated", playerId);
-            return false;
-        }
+
         return true;
     }
 
@@ -183,8 +191,33 @@ public class Board implements IBoard {
     }
 
 
-    public int simulateNewStoneAndCheckForKORuleViolation(){
-    return 1;
+    public int simulateNewStoneAndCheckForKORuleViolation(Stone newStone) throws SQLException {
+        SQLLiteJDBC db = gm.getDatabase();
+        String query = "SELECT move_text FROM moves WHERE game_id="+gm.getGame_id() + " AND move_number=" + (gm.getCurrent_turn() - 1);
+        System.out.println(query);
+        Statement statement = db.getConnection().createStatement();
+
+        try {
+            ResultSet rs = statement.executeQuery(query);
+            if (rs.next()) {
+                String previousMove = rs.getString("move_text");
+                System.out.println(previousMove);
+                if (previousMove.equals("pass")) {
+                    return 1;
+                }
+                int previousMoveX = Integer.parseInt(previousMove.split(" ")[1]);
+                System.out.println(previousMoveX);
+                int previousMoveY = Integer.parseInt(previousMove.split(" ")[2]);
+                System.out.println(previousMoveY);
+
+                if (newStone.getX() == previousMoveX && newStone.getY() == previousMoveY) {
+                    return 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 
     private void calculateChains2(Stone[][] stones) {
