@@ -15,7 +15,7 @@ public class GameManager implements IGameManager {
     private Player player2;
     private int player2score;
     private Player currentPlayer;
-    private String winner;
+    private String winner = "NOONE";
     private boolean isPassedPlayer1 = false;
     private boolean isPassedPlayer2 = false;
     private boolean didBothPlayersPass = false;
@@ -88,7 +88,7 @@ public class GameManager implements IGameManager {
             if (board.checkMove(x, y, currentPlayer.getColor(), currentPlayer.getId())) {
 
 
-                board.performMove(x, y, currentPlayer.getColor());
+                board.performMove(x, y, currentPlayer);
                 try {
                     current_turn++;
                     db.insertNewMove(game_id, current_turn, input);
@@ -104,7 +104,13 @@ public class GameManager implements IGameManager {
                     isPassedPlayer2 = false;
                 }
             } else {
-                board.addErrorMessage("Wrong move - you lose your turn", playerId);
+                board.addErrorMessage("Wrong move - you are being forced to pass", playerId);
+                current_turn++;
+                try {
+                    db.insertNewMove(game_id, current_turn, "pass");
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         } else {
 

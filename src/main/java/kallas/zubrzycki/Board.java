@@ -96,10 +96,10 @@ public class Board implements IBoard {
     }
 
     @Override
-    public void performMove(int x, int y, EPointColor playerColor) {
-        stones[x][y] = new Stone(x, y, playerColor);
+    public void performMove(int x, int y, Player player) {
+        stones[x][y] = new Stone(x, y, player.getColor());
         calculateChains(stones);
-        checkForCaptures(stones, playerColor);
+        checkForCaptures(stones, player);
     }
 
     @Override
@@ -163,11 +163,12 @@ public class Board implements IBoard {
         simulatedStones[newStone.getX()][newStone.getY()] = new Stone(newStone.getX(), newStone.getY(), newStone.getColor());
         resetChains(simulatedStones);
         calculateChains(simulatedStones);
-        return checkForCaptures(simulatedStones, newStone.getColor());
+        return checkForCaptures(simulatedStones, new Player(newStone.getColor(), 9));
 
     }
 
-    public boolean checkForCaptures(Stone[][] allStones, EPointColor color) {
+    public boolean checkForCaptures(Stone[][] allStones, Player player) {
+        EPointColor color = player.getColor();
         boolean anyCaptures = false;
 
         for(Stone[] stones1 : allStones){
@@ -176,6 +177,7 @@ public class Board implements IBoard {
                     if(stone.getChain().countLiberties(allStones) == 0){
                         anyCaptures = true;
                         for(Stone capturedStone : stone.getChain().stones) {
+                            player.setScore(player.getScore() + 1);
                             stones[capturedStone.getX()][capturedStone.getY()].setColor(EPointColor.NONE);
                             stones[capturedStone.getX()][capturedStone.getY()].setChain(null);
                         }
@@ -184,7 +186,6 @@ public class Board implements IBoard {
 
             }
         }
-
         return anyCaptures;
     }
 
@@ -301,25 +302,25 @@ public class Board implements IBoard {
                 if(stone.getColor() == EPointColor.NONE && !stone.visitedDuringScoreCount){
                     HashSet<EPointColor> surroundingColors = new HashSet<>();
                     FloodFillResult result = floodFill(stone, surroundingColors, 0);
-                    System.out.println("Result count: " + result.count);
-                    System.out.println("Result surroundingColors: " + result.surroundingColors);
-                    System.out.println("Player color: " + playerColor);
-                    System.out.println("SurroundingColors size: " + result.surroundingColors.size());
-                    System.out.println("Does it contain player color? " + (result.surroundingColors.contains(playerColor) ? "yes" : "no"));
+                    //System.out.println("Result count: " + result.count);
+                    //System.out.println("Result surroundingColors: " + result.surroundingColors);
+                    //System.out.println("Player color: " + playerColor);
+                    //System.out.println("SurroundingColors size: " + result.surroundingColors.size());
+                    //System.out.println("Does it contain player color? " + (result.surroundingColors.contains(playerColor) ? "yes" : "no"));
                     if(result.surroundingColors.size() == 1 && result.surroundingColors.contains(playerColor)){
-                        System.out.println("Adding score! +=" + result.count);
+                        //System.out.println("Adding score! +=" + result.count);
                         score += result.count;
                     }
                 }
             }
         }
-        System.out.println("Final score: " + score);
+       // System.out.println("Final score: " + score);
         return score;
     }
     private FloodFillResult floodFill(Stone stone, HashSet<EPointColor> surroundingColors, int currentCount){
         int count = 1;
         stone.visitedDuringScoreCount = true;
-        System.out.println(stone.getX() + ", " + stone.getY() + " currentCount:" + currentCount);
+        //System.out.println(stone.getX() + ", " + stone.getY() + " currentCount:" + currentCount);
 
         int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         for (int[] dir : directions) {
